@@ -47,9 +47,11 @@ button.g{background:#777;margin:0}
       <h2 style="margin-top:0">Yeni içerik ekle</h2>
       <label>Başlık</label><input id="baslik">
       <label>Kategori</label><input id="kategori" list="kategoriler" placeholder="Seç veya yeni yaz">
-      <datalist id="kategoriler"><option value="Veliler İçin"><option value="Öğretmenler İçin"><option value="Formlar"><option value="Etkinlikler"><option value="Broşürler"></datalist>
+      <datalist id="kategoriler"><option value="Broşür"><option value="Etkinlik"><option value="Form"><option value="Sunum"><option value="Doküman"><option value="Duyuru"><option value="Modüler Pano"></datalist>
+      <label>Kimin için?</label><input id="seviye" list="seviyeler" placeholder="Seç veya yeni yaz"><datalist id="seviyeler"><option value="Anasınıfı"><option value="İlkokul"><option value="Özel Eğitim"><option value="Veliler"><option value="Öğretmenler"></datalist>
       <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
       <label>Dosya bağlantısı (Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
+      <label>Kapak görseli bağlantısı (isteğe bağlı, boşsa otomatik oluşur)</label><input id="kapak" placeholder="Drive görsel linki">
       <label>Tarih</label><input id="tarih" type="date">
       <button id="ekle">İçeriği ekle</button>
       <div id="mesaj"></div>
@@ -93,12 +95,12 @@ auth.onAuthStateChanged(u => {
 function mesaj(t, ok){ const m=$("mesaj"); m.textContent=t; m.className = ok ? "tamam" : "hata"; }
 
 $("ekle").onclick = async () => {
-  const d = { baslik:$("baslik").value.trim(), kategori:$("kategori").value.trim(),
+  const d = { baslik:$("baslik").value.trim(), kategori:$("kategori").value.trim(), seviye:$("seviye").value.trim(), kapak:$("kapak").value.trim(),
     aciklama:$("aciklama").value.trim(), link:$("link").value.trim(), tarih:$("tarih").value };
   if(!d.baslik || !d.kategori || !d.link){ mesaj("Başlık, kategori ve bağlantı zorunlu.", false); return; }
   try{
     await db.collection("icerikler").add(d);
-    ["baslik","aciklama","link"].forEach(i => $(i).value = "");
+    ["baslik","aciklama","link","kapak"].forEach(i => $(i).value = "");
     mesaj("İçerik eklendi.", true); listele();
   }catch(e){ mesaj("Eklenemedi. Güvenlik kuralını ve e-posta adresini kontrol et.", false); }
 };
@@ -111,7 +113,7 @@ async function listele(){
     const d = doc.data(), s = document.createElement("div"); s.className = "satir";
     s.innerHTML = "<div><b></b><br><small></small></div><button class='k'>Sil</button>";
     s.querySelector("b").textContent = d.baslik;
-    s.querySelector("small").textContent = (d.kategori||"") + " · " + (d.tarih||"");
+    s.querySelector("small").textContent = (d.kategori||"") + (d.seviye?" · "+d.seviye:"") + " · " + (d.tarih||"");
     s.querySelector("button").onclick = async () => {
       if(!confirm("Bu içerik silinsin mi?")) return;
       await doc.ref.delete(); listele();
