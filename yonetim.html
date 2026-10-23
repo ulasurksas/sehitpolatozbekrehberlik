@@ -61,10 +61,12 @@ button.g{background:#777;margin:0}
       <label>Başlık</label><input id="baslik">
       <label>Kategori (birden fazla seçebilirsin)</label><div class="cb" id="katBox"></div>
       <input id="katYeni" style="margin-top:8px" placeholder="Listede yoksa yeni kategori yaz (virgülle ayır)">
+      <label>Görsel İçerik türü (video ve fotoğraflar için işaretle)</label><div class="cb" id="gorBox"></div>
       <label>Düzey (birden fazla seçebilirsin)</label><div class="cb" id="sevBox"></div>
       <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
-      <label>Dosya bağlantısı (Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
+      <label>Dosya bağlantısı (isteğe bağlı, Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
       <label>Video bağlantısı (isteğe bağlı: YouTube veya Drive videosu)</label><input id="video" placeholder="https://youtu.be/...">
+      <label>Fotoğraf bağlantıları (isteğe bağlı, her satıra bir Drive görsel linki)</label><textarea id="fotolar" rows="3" placeholder="https://drive.google.com/file/d/..."></textarea>
       <label>Kapak görseli bağlantısı (isteğe bağlı, boşsa otomatik oluşur)</label><input id="kapak" placeholder="Drive görsel linki">
       <label>Tarih</label><input id="tarih" type="date">
       <button id="ekle">İçeriği ekle</button> <button class="g" id="iptal" hidden>Vazgeç</button>
@@ -95,6 +97,7 @@ const auth=firebase.auth(),db=firebase.firestore();
 const $=id=>document.getElementById(id);
 const KATS=["Broşür","Etkinlik","Form","Sunum","Doküman","Duyuru","Modüler Pano","Veli e-Bülteni"];
 const SEVS=["Anasınıfı","İlkokul","Özel Eğitim"];
+const GOR=["Video","Fotoğraf"];
 const bugun=()=>new Date().toISOString().slice(0,10);
 const kO=d=>d.kategoriler||(d.kategori?[d.kategori]:[]);
 const sO=d=>{const s=d.seviyeler||(d.seviye?[d.seviye]:[]);return s.includes("Tüm Düzeyler")?SEVS:s};
@@ -124,19 +127,19 @@ function mesaj(t,ok){const m=$("mesaj");m.textContent=t;m.className=ok?"tamam":"
 
 function formSifirla(){
   duzenId=null;
-  ["baslik","aciklama","link","video","kapak","katYeni"].forEach(i=>$(i).value="");
+  ["baslik","aciklama","link","video","fotolar","kapak","katYeni"].forEach(i=>$(i).value="");
   $("tarih").value=bugun();
-  cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);
+  cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);cbCiz("gorBox",GOR,[]);
   $("formBaslik").textContent="Yeni içerik ekle";$("ekle").textContent="İçeriği ekle";$("iptal").hidden=true;
 }
 $("iptal").onclick=()=>{formSifirla();mesaj("",true)};
 
 $("ekle").onclick=async()=>{
   const yeni=$("katYeni").value.split(",").map(x=>x.trim()).filter(Boolean);
-  const kategoriler=[...new Set([...sec("katBox"),...yeni])],seviyeler=sec("sevBox");
+  const gor=sec("gorBox"),kategoriler=[...new Set([...sec("katBox"),...yeni,...(gor.length?["Görsel İçerik"]:[]),...gor])],seviyeler=sec("sevBox");
   const d={baslik:$("baslik").value.trim(),kategoriler,seviyeler,kategori:kategoriler[0]||"",seviye:seviyeler[0]||"",
-    aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun()};
-  if(!d.baslik||!kategoriler.length||!seviyeler.length||!d.link){mesaj("Başlık, en az bir kategori, en az bir düzey ve bağlantı zorunlu.",false);return}
+    aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),fotolar:$("fotolar").value.split("\n").map(x=>x.trim()).filter(Boolean),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun()};
+  if(!d.baslik||!kategoriler.length||!seviyeler.length){mesaj("Başlık, en az bir kategori ve en az bir düzey zorunlu.",false);return}
   try{
     if(duzenId){await db.collection("icerikler").doc(duzenId).update(d);formSifirla();mesaj("İçerik güncellendi.",true)}
     else{await db.collection("icerikler").add(d);formSifirla();mesaj("İçerik eklendi.",true)}
@@ -148,8 +151,8 @@ function duzenle(id){
   const d=tumu.find(x=>x.id===id);if(!d)return;
   duzenId=id;
   $("baslik").value=d.baslik||"";$("aciklama").value=d.aciklama||"";$("link").value=d.link||"";
-  $("video").value=d.video||"";$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
-  cbCiz("katBox",KATS,kO(d));cbCiz("sevBox",SEVS,sO(d));
+  $("video").value=d.video||"";$("fotolar").value=(d.fotolar||[]).join("\n");$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
+  cbCiz("katBox",KATS,kO(d).filter(x=>x!=="Görsel İçerik"&&!GOR.includes(x)));cbCiz("sevBox",SEVS,sO(d));cbCiz("gorBox",GOR,kO(d).filter(x=>GOR.includes(x)));
   $("formBaslik").textContent="İçeriği düzenle";$("ekle").textContent="Değişiklikleri kaydet";$("iptal").hidden=false;
   mesaj("",true);$("formBaslik").scrollIntoView({behavior:"smooth"});
 }

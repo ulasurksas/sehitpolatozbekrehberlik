@@ -70,6 +70,8 @@ h2.b{border-left:6px solid var(--sari);padding-left:10px;margin:8px 0 16px}
 .menu .mb{font-size:.72rem;font-weight:700;opacity:.6;padding:8px 12px 2px;text-transform:uppercase}
 .btn.w{background:#25d366;color:#fff}
 .et.v{background:#c0392b}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0}
+.gal img{width:100%;height:160px;object-fit:cover;border-radius:10px;background:#8883}
 .vd{position:relative;padding-top:56.25%;margin:12px 0}
 .vd iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:10px}
 footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
@@ -156,23 +158,28 @@ const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const guv=u=>/^https?:\/\//.test(u||"")?u:"#";
 const dID=u=>{const m=(u||"").match(/\/d\/([\w-]+)|[?&]id=([\w-]+)/);return m?(m[1]||m[2]):null};
 const GRAD=[["#1f5fa8","#12a0d0"],["#f5b818","#f08a24"],["#12a0d0","#5bd1b5"],["#7b4fb5","#1f5fa8"],["#e86a8a","#f5b818"]];
-const IKON={"Broşür":"📄","Etkinlik":"🎯","Form":"📝","Sunum":"🖥️","Doküman":"📚","Duyuru":"📢","Modüler Pano":"🧩"};
+const IKON={"Broşür":"📄","Etkinlik":"🎯","Form":"📝","Sunum":"🖥️","Doküman":"📚","Duyuru":"📢","Modüler Pano":"🧩","Görsel İçerik":"🖼️","Video":"🎬","Fotoğraf":"📷"};
 const SAYFA_BOY=9;
 let hepsi=[],sev="Tümü",kat="Tümü",sf=1;
 
 const kO=i=>i.kategoriler||(i.kategori?[i.kategori]:[]);
 const sO=i=>i.seviyeler||(i.seviye?[i.seviye]:[]);
+const GOR=["Video","Fotoğraf"];
 const yt=u=>{const m=(u||"").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:null};
 function kapak(i){
   const k0=kO(i)[0]||"x",g=GRAD[[...k0].reduce((a,c)=>a+c.charCodeAt(0),0)%GRAD.length];
-  const kd=dID(i.kapak),y=yt(i.video),ld=dID(i.link);
-  const src=kd?`https://drive.google.com/thumbnail?id=${kd}&sz=w700`:y?`https://img.youtube.com/vi/${y}/hqdefault.jpg`:ld?`https://drive.google.com/thumbnail?id=${ld}&sz=w700`:"";
+  const kd=dID(i.kapak),fd=dID((i.fotolar||[])[0]),y=yt(i.video),ld=dID(i.link);
+  const src=kd?`https://drive.google.com/thumbnail?id=${kd}&sz=w700`:fd?`https://drive.google.com/thumbnail?id=${fd}&sz=w700`:y?`https://img.youtube.com/vi/${y}/hqdefault.jpg`:ld?`https://drive.google.com/thumbnail?id=${ld}&sz=w700`:"";
   const img=src?`<img loading="lazy" alt="" src="${src}" onerror="this.remove()">`:"";
   return `<div class="kv" style="background:linear-gradient(135deg,${g[0]},${g[1]})"><span>${IKON[k0]||"✨"}</span>${img}</div>`;
 }
 function etk(i){
   return kO(i).map(c=>`<span class="et">${esc(c)}</span>`).join(" ")+" "+
     sO(i).filter(x=>x!=="Tüm Düzeyler").map(c=>`<span class="et s">${esc(c)}</span>`).join(" ")+(i.video?` <span class="et v">🎬 Video</span>`:"");
+}
+function gal(i){
+  const f=(i.fotolar||[]).map(dID).filter(Boolean);
+  return f.length?`<div class="gal">${f.map(d=>`<a href="https://drive.google.com/file/d/${d}/view"><img loading="lazy" alt="" src="https://drive.google.com/thumbnail?id=${d}&sz=w800"></a>`).join("")}</div>`:"";
 }
 function vid(u){
   const y=yt(u),d=dID(u),s=y?`https://www.youtube-nocookie.com/embed/${y}`:d?`https://drive.google.com/file/d/${d}/preview`:"";
@@ -196,10 +203,10 @@ function ciz(){
 }
 function filtreler(){
   const sevL=["Tümü",...new Set(["Anasınıfı","İlkokul",...hepsi.flatMap(sO).filter(x=>x&&x!=="Tüm Düzeyler")])];
-  const katL=["Tümü",...new Set(hepsi.flatMap(kO).filter(Boolean))];
+  const katL=["Tümü",...new Set([...hepsi.flatMap(kO).filter(Boolean),"Görsel İçerik",...GOR])];
   const sc=$("seviyeler");sc.innerHTML="";
   sevL.forEach(c=>{const b=document.createElement("button");b.className="chip"+(c===sev?" on":"");b.textContent=c;b.onclick=()=>{sev=c;sf=1;filtreler();ciz()};sc.appendChild(b)});
-  $("katSec").innerHTML=katL.map(c=>`<option value="${esc(c)}"${c===kat?" selected":""}>${c==="Tümü"?"Tüm kategoriler":esc(c)}</option>`).join("");
+  $("katSec").innerHTML=katL.map(c=>`<option value="${esc(c)}"${c===kat?" selected":""}>${c==="Tümü"?"Tüm kategoriler":GOR.includes(c)?"↳ "+esc(c):esc(c)}</option>`).join("");
   const mn=$("menu");mn.innerHTML="";
   const bas=t=>{const d=document.createElement("div");d.className="mb";d.textContent=t;mn.appendChild(d)};
   const dugme=(t,fn)=>{const b=document.createElement("button");b.textContent=t;
@@ -208,15 +215,17 @@ function filtreler(){
   dugme("Tüm içerikler",()=>{sev="Tümü";kat="Tümü"});
   sevL.slice(1).forEach(c=>dugme(c,()=>{sev=c;kat="Tümü"}));
   bas("İçerik türü");
-  katL.slice(1).forEach(c=>dugme(c,()=>{kat=c;sev="Tümü"}));
+  katL.slice(1).filter(c=>c!=="Görsel İçerik"&&!GOR.includes(c)).forEach(c=>dugme(c,()=>{kat=c;sev="Tümü"}));
+  dugme("Görsel İçerik",()=>{kat="Görsel İçerik";sev="Tümü"});
+  GOR.forEach(g=>dugme("↳ "+g,()=>{kat=g;sev="Tümü"}));
 }
 function detay(i){
   const l=guv(i.link),id=dID(i.link),pu=location.origin+location.pathname+"#i="+i.id;
   const ind=id?`https://drive.google.com/uc?export=download&id=${id}`:l;
   $("detay").innerHTML=`<p><button class="btn g" onclick="geri()">← Geri dön</button></p>
-  <div class="detay">${kapak(i)}<div class="ic"><div>${etk(i)}</div><h1>${esc(i.baslik)}</h1><small>📅 ${esc(i.tarih)}</small>${vid(i.video)}
+  <div class="detay">${kapak(i)}<div class="ic"><div>${etk(i)}</div><h1>${esc(i.baslik)}</h1><small>📅 ${esc(i.tarih)}</small>${vid(i.video)}${gal(i)}
   <p style="white-space:pre-wrap;flex:none">${esc(i.aciklama)}</p>
-  <div><a class="btn" href="${esc(l)}">İncele</a><a class="btn s" href="${esc(ind)}">İndir</a></div>
+  ${i.link?`<div><a class="btn" href="${esc(l)}">İncele</a><a class="btn s" href="${esc(ind)}">İndir</a></div>`:""}
   <div style="margin-top:8px"><a class="btn w" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(i.baslik+" "+pu)}">WhatsApp'ta paylaş</a><button class="btn g" onclick="kopyala()">Bağlantıyı kopyala</button></div></div></div>`;
 }
 function kopyala(){const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert("Bağlantı kopyalandı."),()=>prompt("Bağlantıyı kopyalayın:",u))}
