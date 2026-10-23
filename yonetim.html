@@ -57,11 +57,22 @@ button.g{background:#777;margin:0}
     </div>
 
     <div class="kutu">
+      <h2 style="margin-top:0">Etkinlik takvimine ekle</h2>
+      <label>Etkinlik adı</label><input id="eBaslik" placeholder="Örn: Veli semineri">
+      <label>Tarih</label><input id="eTarih" type="date">
+      <label>Saat (isteğe bağlı)</label><input id="eSaat" placeholder="Örn: 14.00">
+      <label>Yer (isteğe bağlı)</label><input id="eYer" placeholder="Örn: Okul konferans salonu">
+      <label>Kısa açıklama (isteğe bağlı)</label><input id="eAciklama">
+      <button id="eEkle">Etkinliği ekle</button>
+      <div id="eMesaj"></div>
+      <div id="eListe" style="margin-top:12px"></div>
+    </div>
+
+    <div class="kutu">
       <h2 style="margin-top:0" id="formBaslik">Yeni içerik ekle</h2>
       <label>Başlık</label><input id="baslik">
       <label>Kategori (birden fazla seçebilirsin)</label><div class="cb" id="katBox"></div>
       <input id="katYeni" style="margin-top:8px" placeholder="Listede yoksa yeni kategori yaz (virgülle ayır)">
-      <label>Görsel İçerik türü (video ve fotoğraflar için işaretle)</label><div class="cb" id="gorBox"></div>
       <label>Düzey (birden fazla seçebilirsin)</label><div class="cb" id="sevBox"></div>
       <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
       <label>Dosya bağlantısı (isteğe bağlı, Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
@@ -97,7 +108,6 @@ const auth=firebase.auth(),db=firebase.firestore();
 const $=id=>document.getElementById(id);
 const KATS=["Broşür","Etkinlik","Form","Sunum","Doküman","Duyuru","Modüler Pano","Veli e-Bülteni"];
 const SEVS=["Anasınıfı","İlkokul","Özel Eğitim"];
-const GOR=["Video","Fotoğraf"];
 const bugun=()=>new Date().toISOString().slice(0,10);
 const kO=d=>d.kategoriler||(d.kategori?[d.kategori]:[]);
 const sO=d=>{const s=d.seviyeler||(d.seviye?[d.seviye]:[]);return s.includes("Tüm Düzeyler")?SEVS:s};
@@ -111,7 +121,7 @@ $("girisBtn").onclick=async()=>{
 $("cikis").onclick=()=>auth.signOut();
 auth.onAuthStateChanged(u=>{
   $("girisKutu").hidden=!!u;$("panel").hidden=!u;$("cikis").hidden=!u;
-  if(u){formSifirla();listele();dListele()}
+  if(u){formSifirla();listele();dListele();eListele()}
 });
 
 function cbCiz(kutu,liste,secili){
@@ -129,14 +139,14 @@ function formSifirla(){
   duzenId=null;
   ["baslik","aciklama","link","video","fotolar","kapak","katYeni"].forEach(i=>$(i).value="");
   $("tarih").value=bugun();
-  cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);cbCiz("gorBox",GOR,[]);
+  cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);
   $("formBaslik").textContent="Yeni içerik ekle";$("ekle").textContent="İçeriği ekle";$("iptal").hidden=true;
 }
 $("iptal").onclick=()=>{formSifirla();mesaj("",true)};
 
 $("ekle").onclick=async()=>{
   const yeni=$("katYeni").value.split(",").map(x=>x.trim()).filter(Boolean);
-  const gor=sec("gorBox"),kategoriler=[...new Set([...sec("katBox"),...yeni,...(gor.length?["Görsel İçerik"]:[]),...gor])],seviyeler=sec("sevBox");
+  const kategoriler=[...new Set([...sec("katBox"),...yeni])],seviyeler=sec("sevBox");
   const d={baslik:$("baslik").value.trim(),kategoriler,seviyeler,kategori:kategoriler[0]||"",seviye:seviyeler[0]||"",
     aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),fotolar:$("fotolar").value.split("\n").map(x=>x.trim()).filter(Boolean),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun()};
   if(!d.baslik||!kategoriler.length||!seviyeler.length){mesaj("Başlık, en az bir kategori ve en az bir düzey zorunlu.",false);return}
@@ -152,7 +162,7 @@ function duzenle(id){
   duzenId=id;
   $("baslik").value=d.baslik||"";$("aciklama").value=d.aciklama||"";$("link").value=d.link||"";
   $("video").value=d.video||"";$("fotolar").value=(d.fotolar||[]).join("\n");$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
-  cbCiz("katBox",KATS,kO(d).filter(x=>x!=="Görsel İçerik"&&!GOR.includes(x)));cbCiz("sevBox",SEVS,sO(d));cbCiz("gorBox",GOR,kO(d).filter(x=>GOR.includes(x)));
+  cbCiz("katBox",KATS,kO(d));cbCiz("sevBox",SEVS,sO(d));
   $("formBaslik").textContent="İçeriği düzenle";$("ekle").textContent="Değişiklikleri kaydet";$("iptal").hidden=false;
   mesaj("",true);$("formBaslik").scrollIntoView({behavior:"smooth"});
 }
@@ -195,6 +205,32 @@ async function dListele(){
       s.querySelector("b").textContent=d.metin;
       s.querySelector("small").textContent=d.bitis?("Son gün: "+d.bitis):"Süresiz";
       s.querySelector("button").onclick=async()=>{if(confirm("Duyuru silinsin mi?")){await doc.ref.delete();dListele()}};
+      l.appendChild(s);
+    });
+  }catch(e){l.textContent=""}
+}
+
+function eMesaj(t,ok){const m=$("eMesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
+$("eEkle").onclick=async()=>{
+  const b=$("eBaslik").value.trim(),t=$("eTarih").value;
+  if(!b||!t){eMesaj("Etkinlik adı ve tarih zorunlu.",false);return}
+  try{
+    await db.collection("etkinlikler").add({baslik:b,tarih:t,saat:$("eSaat").value.trim(),yer:$("eYer").value.trim(),aciklama:$("eAciklama").value.trim()});
+    ["eBaslik","eTarih","eSaat","eYer","eAciklama"].forEach(i=>$(i).value="");
+    eMesaj("Etkinlik eklendi.",true);eListele();
+  }catch(e){eMesaj("Eklenemedi. Güvenlik kuralını kontrol et.",false)}
+};
+async function eListele(){
+  const l=$("eListe");
+  try{
+    const sn=await db.collection("etkinlikler").orderBy("tarih","desc").get();
+    l.innerHTML="";
+    sn.forEach(doc=>{
+      const d=doc.data(),s=document.createElement("div");s.className="satir";
+      s.innerHTML="<div><b></b><br><small></small></div><button class='k'>Sil</button>";
+      s.querySelector("b").textContent=d.baslik;
+      s.querySelector("small").textContent=[d.tarih,d.saat,d.yer].filter(Boolean).join(" · ");
+      s.querySelector("button").onclick=async()=>{if(confirm("Etkinlik silinsin mi?")){await doc.ref.delete();eListele()}};
       l.appendChild(s);
     });
   }catch(e){l.textContent=""}

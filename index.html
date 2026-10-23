@@ -74,6 +74,13 @@ h2.b{border-left:6px solid var(--sari);padding-left:10px;margin:8px 0 16px}
 .gal img{width:100%;height:160px;object-fit:cover;border-radius:10px;background:#8883}
 .vd{position:relative;padding-top:56.25%;margin:12px 0}
 .vd iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:10px}
+.iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.etk{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #8883}
+.etk:last-child{border:0}
+.tg{background:var(--mavi);color:#fff;border-radius:10px;padding:4px 10px;text-align:center;min-width:56px;line-height:1.2}
+.pop a{display:block;padding:8px 0;border-bottom:1px solid #8883;text-decoration:none;font-weight:600}
+.pop a:last-child{border:0}
+.kose h3{margin-top:0}
 footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
 .ekip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:16px 0}
 .kisi{background:var(--kart);border-radius:14px;padding:18px;text-align:center;box-shadow:0 2px 10px #0001;border-top:5px solid var(--acik)}
@@ -103,6 +110,16 @@ footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-t
   <p>Veliler ve öğretmenlerimiz için hazırladığımız rehberlik içeriklerine buradan ulaşabilir, inceleyebilir ve indirebilirsiniz.</p></div>
 
   <div class="wrap" id="vitrinKutu" hidden><h2 class="b">Son Eklenenler</h2><div class="vitrin" id="vitrin"></div></div>
+
+  <div class="wrap" id="ekPano" hidden><div class="iki">
+    <div id="etkKutu" hidden><h2 class="b">Yaklaşan Etkinlikler</h2><div class="bilgi" id="etkListe"></div></div>
+    <div id="popKutu" hidden><h2 class="b">Popüler İçerikler</h2><div class="bilgi pop" id="popListe"></div></div>
+  </div></div>
+
+  <div class="wrap"><h2 class="b">Köşelerimiz</h2><div class="izgara">
+    <div class="bilgi kose"><h3>🌱 Anasınıfı Veli Köşesi</h3><p>Okul öncesi dönemde okula uyum, ayrılık kaygısı, uyku ve beslenme düzeni gibi konularda veli yazıları, broşürler ve evde yapılabilecek etkinlikler.</p><button class="btn" onclick="kose('Anasınıfı')">İçeriklere git</button></div>
+    <div class="bilgi kose"><h3>🤝 Özel Eğitim ve Kaynaştırma Köşesi</h3><p>Özel eğitim ve kaynaştırma öğrencilerimizin aileleri ile öğretmenleri için bilgilendirme materyalleri, etkinlik önerileri ve rehber kaynaklar.</p><button class="btn" onclick="kose('Özel Eğitim')">İçeriklere git</button></div>
+  </div></div>
 
   <div class="wrap" id="icerikler">
     <h2 class="b">Tüm İçerikler</h2>
@@ -164,7 +181,6 @@ let hepsi=[],sev="Tümü",kat="Tümü",sf=1;
 
 const kO=i=>i.kategoriler||(i.kategori?[i.kategori]:[]);
 const sO=i=>i.seviyeler||(i.seviye?[i.seviye]:[]);
-const GOR=["Video","Fotoğraf"];
 const yt=u=>{const m=(u||"").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:null};
 function kapak(i){
   const k0=kO(i)[0]||"x",g=GRAD[[...k0].reduce((a,c)=>a+c.charCodeAt(0),0)%GRAD.length];
@@ -203,10 +219,10 @@ function ciz(){
 }
 function filtreler(){
   const sevL=["Tümü",...new Set(["Anasınıfı","İlkokul",...hepsi.flatMap(sO).filter(x=>x&&x!=="Tüm Düzeyler")])];
-  const katL=["Tümü",...new Set([...hepsi.flatMap(kO).filter(Boolean),"Görsel İçerik",...GOR])];
+  const katL=["Tümü",...new Set([...hepsi.flatMap(kO).filter(Boolean),"Modüler Pano","Veli e-Bülteni"])];
   const sc=$("seviyeler");sc.innerHTML="";
   sevL.forEach(c=>{const b=document.createElement("button");b.className="chip"+(c===sev?" on":"");b.textContent=c;b.onclick=()=>{sev=c;sf=1;filtreler();ciz()};sc.appendChild(b)});
-  $("katSec").innerHTML=katL.map(c=>`<option value="${esc(c)}"${c===kat?" selected":""}>${c==="Tümü"?"Tüm kategoriler":GOR.includes(c)?"↳ "+esc(c):esc(c)}</option>`).join("");
+  $("katSec").innerHTML=katL.map(c=>`<option value="${esc(c)}"${c===kat?" selected":""}>${c==="Tümü"?"Tüm kategoriler":esc(c)}</option>`).join("");
   const mn=$("menu");mn.innerHTML="";
   const bas=t=>{const d=document.createElement("div");d.className="mb";d.textContent=t;mn.appendChild(d)};
   const dugme=(t,fn)=>{const b=document.createElement("button");b.textContent=t;
@@ -215,9 +231,7 @@ function filtreler(){
   dugme("Tüm içerikler",()=>{sev="Tümü";kat="Tümü"});
   sevL.slice(1).forEach(c=>dugme(c,()=>{sev=c;kat="Tümü"}));
   bas("İçerik türü");
-  katL.slice(1).filter(c=>c!=="Görsel İçerik"&&!GOR.includes(c)).forEach(c=>dugme(c,()=>{kat=c;sev="Tümü"}));
-  dugme("Görsel İçerik",()=>{kat="Görsel İçerik";sev="Tümü"});
-  GOR.forEach(g=>dugme("↳ "+g,()=>{kat=g;sev="Tümü"}));
+  katL.slice(1).forEach(c=>dugme(c,()=>{kat=c;sev="Tümü"}));
 }
 function detay(i){
   const l=guv(i.link),id=dID(i.link),pu=location.origin+location.pathname+"#i="+i.id;
@@ -233,7 +247,32 @@ function geri(){history.length>1?history.back():(location.hash="")}
 function yonlendir(){
   const m=location.hash.match(/^#i=(.+)$/),i=m&&hepsi.find(x=>x.id===m[1]);
   $("detay").hidden=!i;$("ana").hidden=!!i;
-  if(i){detay(i);scrollTo(0,0)}
+  if(i){detay(i);scrollTo(0,0);say(i)}
+}
+function kose(v){sev=v;kat="Tümü";sf=1;filtreler();ciz();$("icerikler").scrollIntoView()}
+function popCiz(){
+  const l=hepsi.filter(i=>i.goruntulenme>0).sort((a,b)=>b.goruntulenme-a.goruntulenme).slice(0,5);
+  if(!l.length)return;
+  $("popListe").innerHTML=l.map((i,n)=>`<a href="#i=${esc(i.id)}">${n+1}. ${esc(i.baslik)}<br><small>👁 ${i.goruntulenme} görüntülenme</small></a>`).join("");
+  $("popKutu").hidden=false;$("ekPano").hidden=false;
+}
+function say(i){
+  try{
+    if(!firebase.apps.length||i.id.length<10||sessionStorage.getItem("g"+i.id))return;
+    sessionStorage.setItem("g"+i.id,"1");
+    firebase.firestore().collection("icerikler").doc(i.id).update({goruntulenme:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+  }catch(e){}
+}
+async function etkYukle(){
+  try{
+    const b=new Date().toISOString().slice(0,10),ay=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+    const sn=await firebase.firestore().collection("etkinlikler").where("tarih",">=",b).orderBy("tarih").limit(5).get();
+    if(sn.empty)return;
+    $("etkListe").innerHTML=sn.docs.map(x=>{
+      const d=x.data(),t=new Date(d.tarih+"T00:00"),alt=[d.saat&&"🕘 "+esc(d.saat),d.yer&&"📍 "+esc(d.yer)].filter(Boolean).join(" · ");
+      return `<div class="etk"><div class="tg"><b>${t.getDate()}</b><br><small>${ay[t.getMonth()]}</small></div><div><b>${esc(d.baslik)}</b>${alt?`<br><small>${alt}</small>`:""}${d.aciklama?`<br><small>${esc(d.aciklama)}</small>`:""}</div></div>`}).join("");
+    $("etkKutu").hidden=false;$("ekPano").hidden=false;
+  }catch(e){}
 }
 async function duyuruYukle(){
   try{
@@ -255,7 +294,7 @@ async function yukle(){
   $("vitrinKutu").hidden=!hepsi.length;
   $("vitrin").innerHTML=hepsi.slice(0,3).map(kart).join("");
   filtreler();ciz();yonlendir();
-  if(firebase.apps.length)duyuruYukle();
+  popCiz();if(firebase.apps.length){duyuruYukle();etkYukle()}
 }
 $("ara").oninput=()=>{sf=1;ciz()};
 $("katSec").onchange=e=>{kat=e.target.value;sf=1;filtreler();ciz()};
