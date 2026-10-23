@@ -57,6 +57,15 @@ button.g{background:#777;margin:0}
       <div id="mesaj"></div>
     </div>
     <div class="kutu">
+      <h2 style="margin-top:0">Duyuru ekle (ana sayfanın üstünde görünür)</h2>
+      <label>Duyuru metni</label><input id="dMetin" maxlength="140" placeholder="Örn: Veli seminerimiz Cuma saat 14.00'te">
+      <label>Bağlantı (isteğe bağlı)</label><input id="dLink" placeholder="https://...">
+      <label>Son gösterim tarihi (isteğe bağlı, sonra kendiliğinden kalkar)</label><input id="dBitis" type="date">
+      <button id="dEkle">Duyuruyu ekle</button>
+      <div id="dMesaj"></div>
+      <div id="dListe" style="margin-top:12px"></div>
+    </div>
+    <div class="kutu">
       <h2 style="margin-top:0">Mevcut içerikler</h2>
       <div id="liste">Yükleniyor...</div>
     </div>
@@ -89,7 +98,7 @@ $("cikis").onclick = () => auth.signOut();
 
 auth.onAuthStateChanged(u => {
   $("girisKutu").hidden = !!u; $("panel").hidden = !u; $("cikis").hidden = !u;
-  if(u) listele();
+  if(u){listele();dListele()}
 });
 
 function mesaj(t, ok){ const m=$("mesaj"); m.textContent=t; m.className = ok ? "tamam" : "hata"; }
@@ -120,6 +129,32 @@ async function listele(){
     };
     l.appendChild(s);
   });
+}
+
+function dMesaj(t,ok){const m=$("dMesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
+$("dEkle").onclick=async()=>{
+  const m=$("dMetin").value.trim();
+  if(!m){dMesaj("Duyuru metnini yaz.",false);return}
+  try{
+    await db.collection("duyurular").add({metin:m,link:$("dLink").value.trim(),bitis:$("dBitis").value,tarih:new Date().toISOString().slice(0,10)});
+    ["dMetin","dLink","dBitis"].forEach(i=>$(i).value="");
+    dMesaj("Duyuru eklendi.",true);dListele();
+  }catch(e){dMesaj("Eklenemedi. Güvenlik kuralını kontrol et.",false)}
+};
+async function dListele(){
+  const l=$("dListe");
+  try{
+    const sn=await db.collection("duyurular").orderBy("tarih","desc").get();
+    l.innerHTML="";
+    sn.forEach(doc=>{
+      const d=doc.data(),s=document.createElement("div");s.className="satir";
+      s.innerHTML="<div><b></b><br><small></small></div><button class='k'>Sil</button>";
+      s.querySelector("b").textContent=d.metin;
+      s.querySelector("small").textContent=d.bitis?("Son gün: "+d.bitis):"Süresiz";
+      s.querySelector("button").onclick=async()=>{if(confirm("Duyuru silinsin mi?")){await doc.ref.delete();dListele()}};
+      l.appendChild(s);
+    });
+  }catch(e){l.textContent=""}
 }
 </script>
 </body>
