@@ -39,6 +39,13 @@ h2{border-left:6px solid var(--sari);padding-left:10px}
 .yakinda{border:2px dashed var(--acik);text-align:center}
 footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
 #durum{text-align:center;opacity:.8}
+.ekip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:16px 0}
+.kisi{background:var(--kart);border-radius:14px;padding:18px;text-align:center;box-shadow:0 2px 10px #0001;border-top:5px solid var(--acik)}
+.kisi .ik{width:64px;height:64px;border-radius:50%;background:var(--mavi);color:#fff;font-size:1.4rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.kisi h3{margin:0 0 2px;font-size:1.05rem}
+.kisi p{margin:0;font-size:.92rem;opacity:.85}
+.randevu{background:var(--krem);border-left:6px solid var(--sari);border-radius:10px;padding:14px 18px;margin-top:6px}
+.randevu p{margin:4px 0}
 </style>
 </head>
 <body>
@@ -68,8 +75,20 @@ footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-t
 
 <section id="hakkimizda">
   <h2>Hakkımızda</h2>
-  <div class="bilgi"><p>Rehberlik Servisimiz 2019’dan bu yana öğrencilerimizin gelişimini; veli ve öğretmenlerimizle iş birliği içinde desteklemektedir.</p>
-  <p><b>İletişim:</b> okulunuzun rehberlik servisi iletişim bilgilerini buraya yazabilirsiniz.</p></div>
+  <div class="bilgi">
+    <p>Rehberlik Servisimiz 2019’dan bu yana öğrencilerimizin akademik, sosyal ve duygusal gelişimini; veli ve öğretmenlerimizle iş birliği içinde destekliyor. Her çocuğun kendine özgü olduğuna inanır, onların güvenle büyüyebileceği bir okul ortamı için çalışırız.</p>
+    <p>Okulumuzda <b>3 rehber öğretmen</b> görev yapmaktadır:</p>
+    <div class="ekip">
+      <div class="kisi"><div class="ik">YA</div><h3>Yasemin ACAY</h3><p>Rehber Öğretmen</p><p>İlkokul öğrencileri</p></div>
+      <div class="kisi"><div class="ik">HA</div><h3>Hande Nur AKALIN</h3><p>Rehber Öğretmen</p><p>İlkokul öğrencileri</p></div>
+      <div class="kisi"><div class="ik">UU</div><h3>Ulaş URKŞAŞ</h3><p>Rehber Öğretmen</p><p>Anasınıfları ve Özel Eğitim</p></div>
+    </div>
+    <h3>Bize Nasıl Ulaşırsınız?</h3>
+    <div class="randevu">
+      <p>🕘 <b>Görüşme saatleri:</b> Okul mesai saatleri içinde, 09.20 – 14.30</p>
+      <p>📅 <b>Randevu:</b> Rehberlik servisimizle görüşmek isteyen velilerimiz randevuyu sınıf rehber öğretmenlerinden alabilir.</p>
+    </div>
+  </div>
 </section>
 
 <footer>© Şehit Polat Özbek İlkokulu Rehberlik Servisi</footer>
