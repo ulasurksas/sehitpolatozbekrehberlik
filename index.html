@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Şehit Polat Özbek İlkokulu Rehberlik Servisi</title>
+<link rel="icon" href="logo.jpg">
+<style>
+:root{--mavi:#1f5fa8;--acik:#12a0d0;--sari:#f5b818;--krem:#fff8e1;--yazi:#1d2b3a;--zemin:#f5f9fd;--kart:#fff}
+@media (prefers-color-scheme:dark){:root{--zemin:#101a26;--kart:#192636;--yazi:#e8eef5;--krem:#2a2616}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--zemin);color:var(--yazi);line-height:1.6}
+header{background:var(--mavi);color:#fff;position:sticky;top:0;z-index:5}
+.bar{max-width:1050px;margin:auto;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar img{width:48px;height:48px;border-radius:50%;background:#fff}
+.bar b{font-size:1.05rem;flex:1}
+nav a{color:#fff;text-decoration:none;margin-left:14px;font-weight:600}
+nav a:hover{color:var(--sari)}
+.hero{background:linear-gradient(135deg,var(--krem),var(--zemin));text-align:center;padding:40px 16px}
+.hero img{width:180px;max-width:50%;border-radius:50%;background:#fff;box-shadow:0 6px 20px #0002}
+.hero h1{color:var(--mavi);margin:16px 0 6px}
+@media (prefers-color-scheme:dark){.hero h1{color:var(--sari)}}
+.hero p{max-width:620px;margin:auto}
+section{max-width:1050px;margin:auto;padding:32px 16px}
+h2{border-left:6px solid var(--sari);padding-left:10px}
+.araclar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.araclar input{flex:1;min-width:200px;padding:10px 14px;border:2px solid var(--acik);border-radius:24px;font-size:1rem;background:var(--kart);color:var(--yazi)}
+.chip{border:2px solid var(--mavi);background:var(--kart);color:var(--mavi);padding:6px 14px;border-radius:20px;cursor:pointer;font-weight:600}
+.chip.on{background:var(--mavi);color:#fff}
+.izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.kart{background:var(--kart);border-radius:14px;padding:16px;box-shadow:0 2px 10px #0001;border-top:5px solid var(--sari);display:flex;flex-direction:column;gap:8px}
+.kart h3{margin:0;font-size:1.05rem}
+.etiket{align-self:flex-start;background:var(--acik);color:#fff;font-size:.78rem;padding:2px 10px;border-radius:12px}
+.kart small{opacity:.7}
+.kart .d{flex:1;font-size:.95rem}
+.btn{display:inline-block;background:var(--mavi);color:#fff;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;margin-right:6px}
+.btn.s{background:var(--sari);color:#1d2b3a}
+.bilgi{background:var(--kart);border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}
+.yakinda{border:2px dashed var(--acik);text-align:center}
+footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
+#durum{text-align:center;opacity:.8}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <img src="logo.jpg" alt="Rehberlik Servisi logosu">
+  <b>Şehit Polat Özbek İlkokulu<br>Rehberlik Servisi</b>
+  <nav><a href="#icerikler">İçerikler</a><a href="#bep">BEP</a><a href="#hakkimizda">Hakkımızda</a></nav>
+</div></header>
+
+<div class="hero">
+  <img src="logo.jpg" alt="Logo">
+  <h1>Rehberlik Servisi</h1>
+  <p>Veliler ve öğretmenlerimiz için hazırladığımız rehberlik içeriklerine buradan ulaşabilir, inceleyebilir ve indirebilirsiniz.</p>
+</div>
+
+<section id="icerikler">
+  <h2>İçerik Kütüphanesi</h2>
+  <div class="araclar"><input id="ara" type="search" placeholder="İçeriklerde ara..."></div>
+  <div class="araclar" id="kategoriler"></div>
+  <p id="durum">Yükleniyor...</p>
+  <div class="izgara" id="liste"></div>
+</section>
+
+<section id="bep">
+  <div class="bilgi yakinda"><h2 style="border:0">BEP Hazırlama Sistemi</h2><p>Öğretmenlerimiz için bireyselleştirilmiş eğitim planı (BEP) hazırlama aracı çok yakında burada olacak.</p></div>
+</section>
+
+<section id="hakkimizda">
+  <h2>Hakkımızda</h2>
+  <div class="bilgi"><p>Rehberlik Servisimiz 2019’dan bu yana öğrencilerimizin gelişimini; veli ve öğretmenlerimizle iş birliği içinde desteklemektedir.</p>
+  <p><b>İletişim:</b> okulunuzun rehberlik servisi iletişim bilgilerini buraya yazabilirsiniz.</p></div>
+</section>
+
+<footer>© Şehit Polat Özbek İlkokulu Rehberlik Servisi</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// 1) Firebase ayarlarınızı buraya yapıştıracaksınız (adım adım anlatacağım).
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+
+// Firebase bağlanana kadar görünen örnek içerikler
+const ORNEK = [
+  {baslik:"Ders Çalışma Alışkanlıkları",kategori:"Veliler İçin",aciklama:"Evde verimli ders çalışma ortamı için öneriler.",link:"#",tarih:"2026-10-01"},
+  {baslik:"Okula Uyum Süreci",kategori:"Veliler İçin",aciklama:"Yeni başlayan öğrenciler için uyum rehberi.",link:"#",tarih:"2026-09-20"},
+  {baslik:"Sınıf İçi Davranış Yönetimi",kategori:"Öğretmenler İçin",aciklama:"Sınıfta uygulanabilecek pratik stratejiler.",link:"#",tarih:"2026-09-15"},
+  {baslik:"Gözlem Formu",kategori:"Formlar",aciklama:"Öğretmen gözlem formu örneği.",link:"#",tarih:"2026-09-10"}
+];
+
+let hepsi = [], secili = "Tümü";
+const liste = document.getElementById("liste"), durum = document.getElementById("durum");
+
+function ciz(){
+  const q = document.getElementById("ara").value.toLowerCase();
+  const sonuc = hepsi.filter(i =>
+    (secili === "Tümü" || i.kategori === secili) &&
+    (i.baslik + " " + (i.aciklama||"")).toLowerCase().includes(q));
+  liste.innerHTML = "";
+  durum.textContent = sonuc.length ? "" : "Bu aramaya uygun içerik bulunamadı.";
+  sonuc.forEach(i => {
+    const k = document.createElement("div"); k.className = "kart";
+    const link = i.link || "#";
+    k.innerHTML = `<span class="etiket"></span><h3></h3><div class="d"></div><small></small>
+      <div><a class="btn" target="_blank" rel="noopener">İncele</a><a class="btn s" target="_blank" rel="noopener" download>İndir</a></div>`;
+    k.querySelector(".etiket").textContent = i.kategori || "Genel";
+    k.querySelector("h3").textContent = i.baslik;
+    k.querySelector(".d").textContent = i.aciklama || "";
+    k.querySelector("small").textContent = i.tarih || "";
+    k.querySelectorAll("a").forEach(a => a.href = link);
+    liste.appendChild(k);
+  });
+}
+
+function kategoriCiz(){
+  const kat = ["Tümü", ...new Set(hepsi.map(i => i.kategori).filter(Boolean))];
+  const kap = document.getElementById("kategoriler"); kap.innerHTML = "";
+  kat.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip" + (c === secili ? " on" : ""); b.textContent = c;
+    b.onclick = () => { secili = c; kategoriCiz(); ciz(); };
+    kap.appendChild(b);
+  });
+}
+
+async function yukle(){
+  try{
+    if(!firebaseConfig.apiKey) throw new Error("ayar yok");
+    firebase.initializeApp(firebaseConfig);
+    const snap = await firebase.firestore().collection("icerikler").orderBy("tarih","desc").get();
+    hepsi = snap.docs.map(d => d.data());
+  }catch(e){
+    hepsi = ORNEK; // Firebase henüz bağlı değil
+  }
+  kategoriCiz(); ciz();
+}
+document.getElementById("ara").addEventListener("input", ciz);
+yukle();
+</script>
+</body>
+</html>
