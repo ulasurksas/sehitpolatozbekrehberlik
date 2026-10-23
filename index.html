@@ -77,14 +77,14 @@ footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-t
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// 1) Firebase ayarlarınızı buraya yapıştıracaksınız (adım adım anlatacağım).
+// Firebase ayarları
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyCMWLEXorOncOjfVP6z8PQ0qu6zm49gNWw",
+  authDomain: "polatozbekrehberlik.firebaseapp.com",
+  projectId: "polatozbekrehberlik",
+  storageBucket: "polatozbekrehberlik.firebasestorage.app",
+  messagingSenderId: "260630742799",
+  appId: "1:260630742799:web:a8282da6bbe215e14f607a"
 };
 
 // Firebase bağlanana kadar görünen örnek içerikler
@@ -109,7 +109,7 @@ function ciz(){
     const k = document.createElement("div"); k.className = "kart";
     const link = i.link || "#";
     k.innerHTML = `<span class="etiket"></span><h3></h3><div class="d"></div><small></small>
-      <div><a class="btn" target="_blank" rel="noopener">İncele</a><a class="btn s" target="_blank" rel="noopener" download>İndir</a></div>`;
+      <div><a class="btn">İncele</a><a class="btn s" target="_blank" rel="noopener" download>İndir</a></div>`;
     k.querySelector(".etiket").textContent = i.kategori || "Genel";
     k.querySelector("h3").textContent = i.baslik;
     k.querySelector(".d").textContent = i.aciklama || "";
