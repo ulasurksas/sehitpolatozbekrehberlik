@@ -21,12 +21,15 @@ label{display:block;font-weight:600;margin:10px 0 4px}
 input,textarea,select{width:100%;padding:10px;border:2px solid #12a0d0;border-radius:8px;font:inherit;background:var(--kart);color:var(--yazi)}
 button{background:var(--mavi);color:#fff;border:0;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:14px;font-size:1rem}
 button.k{background:#c0392b;margin:0;padding:6px 12px;font-size:.85rem}
+button.d{background:#12a0d0;margin:0;padding:6px 12px;font-size:.85rem}
 button.g{background:#777;margin:0}
-.satir{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #8883}
+.cb{display:flex;flex-wrap:wrap;gap:8px}
+.cb label{display:flex;align-items:center;gap:6px;font-weight:500;margin:0;padding:6px 12px;border-radius:20px;border:2px solid #12a0d0;cursor:pointer}
+.cb input{width:auto}
+.satir{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #8883}
 .satir div{flex:1}
 .satir small{opacity:.7}
-#mesaj{font-weight:600;margin-top:10px}
-.hata{color:#c0392b}.tamam{color:#1e8449}
+.tamam{color:#1e8449;font-weight:600}.hata{color:#c0392b;font-weight:600}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -44,19 +47,6 @@ button.g{background:#777;margin:0}
 
   <div id="panel" hidden>
     <div class="kutu">
-      <h2 style="margin-top:0">Yeni içerik ekle</h2>
-      <label>Başlık</label><input id="baslik">
-      <label>Kategori</label><input id="kategori" list="kategoriler" placeholder="Seç veya yeni yaz">
-      <datalist id="kategoriler"><option value="Broşür"><option value="Etkinlik"><option value="Form"><option value="Sunum"><option value="Doküman"><option value="Duyuru"><option value="Modüler Pano"></datalist>
-      <label>Düzey (içerik hangi kategorinin altında toplansın?)</label><select id="seviye"><option value="">Seçiniz</option><option>Anasınıfı</option><option>İlkokul</option><option>Özel Eğitim</option><option>Tüm Düzeyler</option></select>
-      <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
-      <label>Dosya bağlantısı (Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
-      <label>Kapak görseli bağlantısı (isteğe bağlı, boşsa otomatik oluşur)</label><input id="kapak" placeholder="Drive görsel linki">
-      <label>Tarih</label><input id="tarih" type="date">
-      <button id="ekle">İçeriği ekle</button>
-      <div id="mesaj"></div>
-    </div>
-    <div class="kutu">
       <h2 style="margin-top:0">Duyuru ekle (ana sayfanın üstünde görünür)</h2>
       <label>Duyuru metni</label><input id="dMetin" maxlength="140" placeholder="Örn: Veli seminerimiz Cuma saat 14.00'te">
       <label>Bağlantı (isteğe bağlı)</label><input id="dLink" placeholder="https://...">
@@ -65,6 +55,22 @@ button.g{background:#777;margin:0}
       <div id="dMesaj"></div>
       <div id="dListe" style="margin-top:12px"></div>
     </div>
+
+    <div class="kutu">
+      <h2 style="margin-top:0" id="formBaslik">Yeni içerik ekle</h2>
+      <label>Başlık</label><input id="baslik">
+      <label>Kategori (birden fazla seçebilirsin)</label><div class="cb" id="katBox"></div>
+      <input id="katYeni" style="margin-top:8px" placeholder="Listede yoksa yeni kategori yaz (virgülle ayır)">
+      <label>Düzey (birden fazla seçebilirsin)</label><div class="cb" id="sevBox"></div>
+      <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
+      <label>Dosya bağlantısı (Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
+      <label>Video bağlantısı (isteğe bağlı: YouTube veya Drive videosu)</label><input id="video" placeholder="https://youtu.be/...">
+      <label>Kapak görseli bağlantısı (isteğe bağlı, boşsa otomatik oluşur)</label><input id="kapak" placeholder="Drive görsel linki">
+      <label>Tarih</label><input id="tarih" type="date">
+      <button id="ekle">İçeriği ekle</button> <button class="g" id="iptal" hidden>Vazgeç</button>
+      <div id="mesaj"></div>
+    </div>
+
     <div class="kutu">
       <h2 style="margin-top:0">Mevcut içerikler</h2>
       <div id="liste">Yükleniyor...</div>
@@ -85,48 +91,82 @@ firebase.initializeApp({
   messagingSenderId: "260630742799",
   appId: "1:260630742799:web:a8282da6bbe215e14f607a"
 });
-const auth = firebase.auth(), db = firebase.firestore();
-const $ = id => document.getElementById(id);
-$("tarih").value = new Date().toISOString().slice(0,10);
+const auth=firebase.auth(),db=firebase.firestore();
+const $=id=>document.getElementById(id);
+const KATS=["Broşür","Etkinlik","Form","Sunum","Doküman","Duyuru","Modüler Pano","Veli e-Bülteni"];
+const SEVS=["Anasınıfı","İlkokul","Özel Eğitim"];
+const bugun=()=>new Date().toISOString().slice(0,10);
+const kO=d=>d.kategoriler||(d.kategori?[d.kategori]:[]);
+const sO=d=>{const s=d.seviyeler||(d.seviye?[d.seviye]:[]);return s.includes("Tüm Düzeyler")?SEVS:s};
+let duzenId=null,tumu=[];
 
-$("girisBtn").onclick = async () => {
-  $("girisMesaj").textContent = "";
-  try { await auth.signInWithEmailAndPassword($("eposta").value.trim(), $("sifre").value); }
-  catch(e){ $("girisMesaj").textContent = "Giriş başarısız. E-posta veya şifreyi kontrol et."; }
+$("girisBtn").onclick=async()=>{
+  $("girisMesaj").textContent="";
+  try{await auth.signInWithEmailAndPassword($("eposta").value.trim(),$("sifre").value)}
+  catch(e){$("girisMesaj").textContent="Giriş başarısız. E-posta veya şifreyi kontrol et."}
 };
-$("cikis").onclick = () => auth.signOut();
-
-auth.onAuthStateChanged(u => {
-  $("girisKutu").hidden = !!u; $("panel").hidden = !u; $("cikis").hidden = !u;
-  if(u){listele();dListele()}
+$("cikis").onclick=()=>auth.signOut();
+auth.onAuthStateChanged(u=>{
+  $("girisKutu").hidden=!!u;$("panel").hidden=!u;$("cikis").hidden=!u;
+  if(u){formSifirla();listele();dListele()}
 });
 
-function mesaj(t, ok){ const m=$("mesaj"); m.textContent=t; m.className = ok ? "tamam" : "hata"; }
+function cbCiz(kutu,liste,secili){
+  const k=$(kutu);k.innerHTML="";
+  [...new Set([...liste,...secili])].forEach(v=>{
+    const l=document.createElement("label"),c=document.createElement("input");
+    c.type="checkbox";c.value=v;c.checked=secili.includes(v);
+    l.appendChild(c);l.append(" "+v);k.appendChild(l);
+  });
+}
+const sec=k=>[...$(k).querySelectorAll("input:checked")].map(c=>c.value);
+function mesaj(t,ok){const m=$("mesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
 
-$("ekle").onclick = async () => {
-  const d = { baslik:$("baslik").value.trim(), kategori:$("kategori").value.trim(), seviye:$("seviye").value.trim(), kapak:$("kapak").value.trim(),
-    aciklama:$("aciklama").value.trim(), link:$("link").value.trim(), tarih:$("tarih").value };
-  if(!d.baslik || !d.kategori || !d.seviye || !d.link){ mesaj("Başlık, kategori, düzey ve bağlantı zorunlu.", false); return; }
+function formSifirla(){
+  duzenId=null;
+  ["baslik","aciklama","link","video","kapak","katYeni"].forEach(i=>$(i).value="");
+  $("tarih").value=bugun();
+  cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);
+  $("formBaslik").textContent="Yeni içerik ekle";$("ekle").textContent="İçeriği ekle";$("iptal").hidden=true;
+}
+$("iptal").onclick=()=>{formSifirla();mesaj("",true)};
+
+$("ekle").onclick=async()=>{
+  const yeni=$("katYeni").value.split(",").map(x=>x.trim()).filter(Boolean);
+  const kategoriler=[...new Set([...sec("katBox"),...yeni])],seviyeler=sec("sevBox");
+  const d={baslik:$("baslik").value.trim(),kategoriler,seviyeler,kategori:kategoriler[0]||"",seviye:seviyeler[0]||"",
+    aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun()};
+  if(!d.baslik||!kategoriler.length||!seviyeler.length||!d.link){mesaj("Başlık, en az bir kategori, en az bir düzey ve bağlantı zorunlu.",false);return}
   try{
-    await db.collection("icerikler").add(d);
-    ["baslik","aciklama","link","kapak"].forEach(i => $(i).value = "");
-    mesaj("İçerik eklendi.", true); listele();
-  }catch(e){ mesaj("Eklenemedi. Güvenlik kuralını ve e-posta adresini kontrol et.", false); }
+    if(duzenId){await db.collection("icerikler").doc(duzenId).update(d);formSifirla();mesaj("İçerik güncellendi.",true)}
+    else{await db.collection("icerikler").add(d);formSifirla();mesaj("İçerik eklendi.",true)}
+    listele();
+  }catch(e){mesaj("Kaydedilemedi. Güvenlik kuralını ve e-posta adresini kontrol et.",false)}
 };
 
+function duzenle(id){
+  const d=tumu.find(x=>x.id===id);if(!d)return;
+  duzenId=id;
+  $("baslik").value=d.baslik||"";$("aciklama").value=d.aciklama||"";$("link").value=d.link||"";
+  $("video").value=d.video||"";$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
+  cbCiz("katBox",KATS,kO(d));cbCiz("sevBox",SEVS,sO(d));
+  $("formBaslik").textContent="İçeriği düzenle";$("ekle").textContent="Değişiklikleri kaydet";$("iptal").hidden=false;
+  mesaj("",true);$("formBaslik").scrollIntoView({behavior:"smooth"});
+}
+
 async function listele(){
-  const snap = await db.collection("icerikler").orderBy("tarih","desc").get();
-  const l = $("liste"); l.innerHTML = "";
-  if(snap.empty){ l.textContent = "Henüz içerik yok."; return; }
-  snap.forEach(doc => {
-    const d = doc.data(), s = document.createElement("div"); s.className = "satir";
-    s.innerHTML = "<div><b></b><br><small></small></div><button class='k'>Sil</button>";
-    s.querySelector("b").textContent = d.baslik;
-    s.querySelector("small").textContent = (d.kategori||"") + (d.seviye?" · "+d.seviye:"") + " · " + (d.tarih||"");
-    s.querySelector("button").onclick = async () => {
-      if(!confirm("Bu içerik silinsin mi?")) return;
-      await doc.ref.delete(); listele();
-    };
+  const sn=await db.collection("icerikler").orderBy("tarih","desc").get();
+  tumu=sn.docs.map(x=>({id:x.id,...x.data()}));
+  const l=$("liste");l.innerHTML="";
+  if(!tumu.length){l.textContent="Henüz içerik yok.";return}
+  tumu.forEach(d=>{
+    const s=document.createElement("div");s.className="satir";
+    s.innerHTML="<div><b></b><br><small></small></div><button class='d'>Düzenle</button><button class='k'>Sil</button>";
+    s.querySelector("b").textContent=d.baslik;
+    s.querySelector("small").textContent=[kO(d).join(", "),sO(d).join(", "),d.tarih].filter(Boolean).join(" · ");
+    const [b1,b2]=s.querySelectorAll("button");
+    b1.onclick=()=>duzenle(d.id);
+    b2.onclick=async()=>{if(!confirm("Bu içerik silinsin mi?"))return;await db.collection("icerikler").doc(d.id).delete();if(duzenId===d.id)formSifirla();listele()};
     l.appendChild(s);
   });
 }
@@ -136,7 +176,7 @@ $("dEkle").onclick=async()=>{
   const m=$("dMetin").value.trim();
   if(!m){dMesaj("Duyuru metnini yaz.",false);return}
   try{
-    await db.collection("duyurular").add({metin:m,link:$("dLink").value.trim(),bitis:$("dBitis").value,tarih:new Date().toISOString().slice(0,10)});
+    await db.collection("duyurular").add({metin:m,link:$("dLink").value.trim(),bitis:$("dBitis").value,tarih:bugun()});
     ["dMetin","dLink","dBitis"].forEach(i=>$(i).value="");
     dMesaj("Duyuru eklendi.",true);dListele();
   }catch(e){dMesaj("Eklenemedi. Güvenlik kuralını kontrol et.",false)}
