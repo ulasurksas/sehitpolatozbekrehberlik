@@ -67,6 +67,8 @@ h2.b{border-left:6px solid var(--sari);padding-left:10px;margin:8px 0 16px}
 #duyuru{background:var(--sari);color:#1d2b3a;padding:8px 16px;text-align:center;font-weight:600}
 #duyuru div{max-width:1100px;margin:2px auto}
 #duyuru a{text-decoration:underline}
+.menu .mb{font-size:.72rem;font-weight:700;opacity:.6;padding:8px 12px 2px;text-transform:uppercase}
+.btn.w{background:#25d366;color:#fff}
 footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
 .ekip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:16px 0}
 .kisi{background:var(--kart);border-radius:14px;padding:18px;text-align:center;box-shadow:0 2px 10px #0001;border-top:5px solid var(--acik)}
@@ -170,7 +172,7 @@ function kart(i){
 
 function ciz(){
   const q=$("ara").value.toLowerCase();
-  const s=hepsi.filter(i=>(sev==="Tümü"||i.seviye===sev)&&(kat==="Tümü"||i.kategori===kat)&&
+  const s=hepsi.filter(i=>(sev==="Tümü"||i.seviye===sev||i.seviye==="Tüm Düzeyler")&&(kat==="Tümü"||i.kategori===kat)&&
     (i.baslik+" "+(i.aciklama||"")).toLowerCase().includes(q));
   const top=Math.max(1,Math.ceil(s.length/SAYFA_BOY)); if(sf>top)sf=top;
   $("liste").innerHTML=s.slice((sf-1)*SAYFA_BOY,sf*SAYFA_BOY).map(kart).join("");
@@ -179,23 +181,31 @@ function ciz(){
   if(top>1)for(let n=1;n<=top;n++){const b=document.createElement("button");b.className="chip"+(n===sf?" on":"");b.textContent=n;b.onclick=()=>{sf=n;ciz();$("icerikler").scrollIntoView()};p.appendChild(b)}
 }
 function filtreler(){
-  const sevL=["Tümü",...new Set(hepsi.map(i=>i.seviye).filter(Boolean))];
+  const sevL=["Tümü",...new Set(["Anasınıfı","İlkokul",...hepsi.map(i=>i.seviye).filter(x=>x&&x!=="Tüm Düzeyler")])];
   const katL=["Tümü",...new Set(hepsi.map(i=>i.kategori).filter(Boolean))];
   const sc=$("seviyeler");sc.innerHTML="";
   sevL.forEach(c=>{const b=document.createElement("button");b.className="chip"+(c===sev?" on":"");b.textContent=c;b.onclick=()=>{sev=c;sf=1;filtreler();ciz()};sc.appendChild(b)});
   $("katSec").innerHTML=katL.map(c=>`<option value="${esc(c)}"${c===kat?" selected":""}>${c==="Tümü"?"Tüm kategoriler":esc(c)}</option>`).join("");
-  $("menu").innerHTML="";
-  katL.forEach(c=>{const b=document.createElement("button");b.textContent=c==="Tümü"?"Tüm içerikler":c;
-    b.onclick=()=>{kat=c;sf=1;location.hash="";filtreler();ciz();document.activeElement.blur();$("icerikler").scrollIntoView()};$("menu").appendChild(b)});
+  const mn=$("menu");mn.innerHTML="";
+  const bas=t=>{const d=document.createElement("div");d.className="mb";d.textContent=t;mn.appendChild(d)};
+  const dugme=(t,fn)=>{const b=document.createElement("button");b.textContent=t;
+    b.onclick=()=>{location.hash="";fn();sf=1;filtreler();ciz();document.activeElement.blur();$("icerikler").scrollIntoView()};mn.appendChild(b)};
+  bas("Okul düzeyi");
+  dugme("Tüm içerikler",()=>{sev="Tümü";kat="Tümü"});
+  sevL.slice(1).forEach(c=>dugme(c,()=>{sev=c;kat="Tümü"}));
+  bas("İçerik türü");
+  katL.slice(1).forEach(c=>dugme(c,()=>{kat=c;sev="Tümü"}));
 }
 function detay(i){
-  const l=guv(i.link),id=dID(i.link);
+  const l=guv(i.link),id=dID(i.link),pu=location.origin+location.pathname+"#i="+i.id;
   const ind=id?`https://drive.google.com/uc?export=download&id=${id}`:l;
   $("detay").innerHTML=`<p><button class="btn g" onclick="geri()">← Geri dön</button></p>
   <div class="detay">${kapak(i)}<div class="ic"><div>${etk(i)}</div><h1>${esc(i.baslik)}</h1><small>📅 ${esc(i.tarih)}</small>
   <p style="white-space:pre-wrap;flex:none">${esc(i.aciklama)}</p>
-  <div><a class="btn" href="${esc(l)}">İncele</a><a class="btn s" href="${esc(ind)}">İndir</a></div></div></div>`;
+  <div><a class="btn" href="${esc(l)}">İncele</a><a class="btn s" href="${esc(ind)}">İndir</a></div>
+  <div style="margin-top:8px"><a class="btn w" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(i.baslik+" "+pu)}">WhatsApp'ta paylaş</a><button class="btn g" onclick="kopyala()">Bağlantıyı kopyala</button></div></div></div>`;
 }
+function kopyala(){const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert("Bağlantı kopyalandı."),()=>prompt("Bağlantıyı kopyalayın:",u))}
 function geri(){history.length>1?history.back():(location.hash="")}
 function yonlendir(){
   const m=location.hash.match(/^#i=(.+)$/),i=m&&hepsi.find(x=>x.id===m[1]);

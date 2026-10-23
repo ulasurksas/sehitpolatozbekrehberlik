@@ -18,7 +18,7 @@ body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--zemin);co
 @media (prefers-color-scheme:dark){.ust h1{color:var(--sari)}}
 .kutu{background:var(--kart);border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001;margin-bottom:18px;border-top:5px solid var(--sari)}
 label{display:block;font-weight:600;margin:10px 0 4px}
-input,textarea{width:100%;padding:10px;border:2px solid #12a0d0;border-radius:8px;font:inherit;background:var(--kart);color:var(--yazi)}
+input,textarea,select{width:100%;padding:10px;border:2px solid #12a0d0;border-radius:8px;font:inherit;background:var(--kart);color:var(--yazi)}
 button{background:var(--mavi);color:#fff;border:0;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:14px;font-size:1rem}
 button.k{background:#c0392b;margin:0;padding:6px 12px;font-size:.85rem}
 button.g{background:#777;margin:0}
@@ -48,7 +48,7 @@ button.g{background:#777;margin:0}
       <label>Başlık</label><input id="baslik">
       <label>Kategori</label><input id="kategori" list="kategoriler" placeholder="Seç veya yeni yaz">
       <datalist id="kategoriler"><option value="Broşür"><option value="Etkinlik"><option value="Form"><option value="Sunum"><option value="Doküman"><option value="Duyuru"><option value="Modüler Pano"></datalist>
-      <label>Kimin için?</label><input id="seviye" list="seviyeler" placeholder="Seç veya yeni yaz"><datalist id="seviyeler"><option value="Anasınıfı"><option value="İlkokul"><option value="Özel Eğitim"><option value="Veliler"><option value="Öğretmenler"></datalist>
+      <label>Düzey (içerik hangi kategorinin altında toplansın?)</label><select id="seviye"><option value="">Seçiniz</option><option>Anasınıfı</option><option>İlkokul</option><option>Özel Eğitim</option><option>Tüm Düzeyler</option></select>
       <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
       <label>Dosya bağlantısı (Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
       <label>Kapak görseli bağlantısı (isteğe bağlı, boşsa otomatik oluşur)</label><input id="kapak" placeholder="Drive görsel linki">
@@ -106,7 +106,7 @@ function mesaj(t, ok){ const m=$("mesaj"); m.textContent=t; m.className = ok ? "
 $("ekle").onclick = async () => {
   const d = { baslik:$("baslik").value.trim(), kategori:$("kategori").value.trim(), seviye:$("seviye").value.trim(), kapak:$("kapak").value.trim(),
     aciklama:$("aciklama").value.trim(), link:$("link").value.trim(), tarih:$("tarih").value };
-  if(!d.baslik || !d.kategori || !d.link){ mesaj("Başlık, kategori ve bağlantı zorunlu.", false); return; }
+  if(!d.baslik || !d.kategori || !d.seviye || !d.link){ mesaj("Başlık, kategori, düzey ve bağlantı zorunlu.", false); return; }
   try{
     await db.collection("icerikler").add(d);
     ["baslik","aciklama","link","kapak"].forEach(i => $(i).value = "");
