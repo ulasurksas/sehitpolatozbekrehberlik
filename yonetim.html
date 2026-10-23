@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Yönetim Paneli - Rehberlik Servisi</title>
+<link rel="icon" href="logo.jpg">
+<style>
+:root{--mavi:#1f5fa8;--sari:#f5b818;--zemin:#f5f9fd;--kart:#fff;--yazi:#1d2b3a}
+@media (prefers-color-scheme:dark){:root{--zemin:#101a26;--kart:#192636;--yazi:#e8eef5}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--zemin);color:var(--yazi);line-height:1.5}
+.wrap{max-width:720px;margin:auto;padding:20px 16px}
+.ust{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.ust img{width:56px;height:56px;border-radius:50%;background:#fff}
+.ust h1{font-size:1.2rem;margin:0;flex:1;color:var(--mavi)}
+@media (prefers-color-scheme:dark){.ust h1{color:var(--sari)}}
+.kutu{background:var(--kart);border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001;margin-bottom:18px;border-top:5px solid var(--sari)}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input,textarea{width:100%;padding:10px;border:2px solid #12a0d0;border-radius:8px;font:inherit;background:var(--kart);color:var(--yazi)}
+button{background:var(--mavi);color:#fff;border:0;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:14px;font-size:1rem}
+button.k{background:#c0392b;margin:0;padding:6px 12px;font-size:.85rem}
+button.g{background:#777;margin:0}
+.satir{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #8883}
+.satir div{flex:1}
+.satir small{opacity:.7}
+#mesaj{font-weight:600;margin-top:10px}
+.hata{color:#c0392b}.tamam{color:#1e8449}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="ust"><img src="logo.jpg" alt="Logo"><h1>Rehberlik Servisi Yönetim Paneli</h1><button class="g" id="cikis" hidden>Çıkış</button></div>
+
+  <div class="kutu" id="girisKutu">
+    <h2 style="margin-top:0">Giriş</h2>
+    <label>E-posta</label><input id="eposta" type="email" autocomplete="username">
+    <label>Şifre</label><input id="sifre" type="password" autocomplete="current-password">
+    <button id="girisBtn">Giriş yap</button>
+    <div id="girisMesaj" class="hata"></div>
+  </div>
+
+  <div id="panel" hidden>
+    <div class="kutu">
+      <h2 style="margin-top:0">Yeni içerik ekle</h2>
+      <label>Başlık</label><input id="baslik">
+      <label>Kategori</label><input id="kategori" list="kategoriler" placeholder="Seç veya yeni yaz">
+      <datalist id="kategoriler"><option value="Veliler İçin"><option value="Öğretmenler İçin"><option value="Formlar"><option value="Etkinlikler"><option value="Broşürler"></datalist>
+      <label>Açıklama</label><textarea id="aciklama" rows="3"></textarea>
+      <label>Dosya bağlantısı (Google Drive linki)</label><input id="link" placeholder="https://drive.google.com/...">
+      <label>Tarih</label><input id="tarih" type="date">
+      <button id="ekle">İçeriği ekle</button>
+      <div id="mesaj"></div>
+    </div>
+    <div class="kutu">
+      <h2 style="margin-top:0">Mevcut içerikler</h2>
+      <div id="liste">Yükleniyor...</div>
+    </div>
+  </div>
+  <p><a href="index.html">← Siteye dön</a></p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyCMWLEXorOncOjfVP6z8PQ0qu6zm49gNWw",
+  authDomain: "polatozbekrehberlik.firebaseapp.com",
+  projectId: "polatozbekrehberlik",
+  storageBucket: "polatozbekrehberlik.firebasestorage.app",
+  messagingSenderId: "260630742799",
+  appId: "1:260630742799:web:a8282da6bbe215e14f607a"
+});
+const auth = firebase.auth(), db = firebase.firestore();
+const $ = id => document.getElementById(id);
+$("tarih").value = new Date().toISOString().slice(0,10);
+
+$("girisBtn").onclick = async () => {
+  $("girisMesaj").textContent = "";
+  try { await auth.signInWithEmailAndPassword($("eposta").value.trim(), $("sifre").value); }
+  catch(e){ $("girisMesaj").textContent = "Giriş başarısız. E-posta veya şifreyi kontrol et."; }
+};
+$("cikis").onclick = () => auth.signOut();
+
+auth.onAuthStateChanged(u => {
+  $("girisKutu").hidden = !!u; $("panel").hidden = !u; $("cikis").hidden = !u;
+  if(u) listele();
+});
+
+function mesaj(t, ok){ const m=$("mesaj"); m.textContent=t; m.className = ok ? "tamam" : "hata"; }
+
+$("ekle").onclick = async () => {
+  const d = { baslik:$("baslik").value.trim(), kategori:$("kategori").value.trim(),
+    aciklama:$("aciklama").value.trim(), link:$("link").value.trim(), tarih:$("tarih").value };
+  if(!d.baslik || !d.kategori || !d.link){ mesaj("Başlık, kategori ve bağlantı zorunlu.", false); return; }
+  try{
+    await db.collection("icerikler").add(d);
+    ["baslik","aciklama","link"].forEach(i => $(i).value = "");
+    mesaj("İçerik eklendi.", true); listele();
+  }catch(e){ mesaj("Eklenemedi. Güvenlik kuralını ve e-posta adresini kontrol et.", false); }
+};
+
+async function listele(){
+  const snap = await db.collection("icerikler").orderBy("tarih","desc").get();
+  const l = $("liste"); l.innerHTML = "";
+  if(snap.empty){ l.textContent = "Henüz içerik yok."; return; }
+  snap.forEach(doc => {
+    const d = doc.data(), s = document.createElement("div"); s.className = "satir";
+    s.innerHTML = "<div><b></b><br><small></small></div><button class='k'>Sil</button>";
+    s.querySelector("b").textContent = d.baslik;
+    s.querySelector("small").textContent = (d.kategori||"") + " · " + (d.tarih||"");
+    s.querySelector("button").onclick = async () => {
+      if(!confirm("Bu içerik silinsin mi?")) return;
+      await doc.ref.delete(); listele();
+    };
+    l.appendChild(s);
+  });
+}
+</script>
+</body>
+</html>
