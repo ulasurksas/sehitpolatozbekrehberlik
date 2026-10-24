@@ -9,298 +9,32 @@
 :root{--mavi:#1f5fa8;--acik:#12a0d0;--sari:#f5b818;--krem:#fff8e1;--yazi:#1d2b3a;--zemin:#f5f9fd;--kart:#fff}
 @media (prefers-color-scheme:dark){:root{--zemin:#101a26;--kart:#192636;--yazi:#e8eef5;--krem:#2a2616}}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--zemin);color:var(--yazi);line-height:1.6}
-a{color:inherit}
-[hidden]{display:none!important}
-header{background:var(--mavi);color:#fff;position:sticky;top:0;z-index:10}
-.bar{max-width:1100px;margin:auto;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.bar>a{display:flex;align-items:center;gap:10px;text-decoration:none;flex:1;font-weight:700;line-height:1.2}
-.bar img{width:48px;height:48px;border-radius:50%;background:#fff}
-nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
-nav>a,.dd>button{color:#fff;background:none;border:0;font:inherit;font-weight:600;padding:8px 12px;cursor:pointer;text-decoration:none;border-radius:8px}
-nav>a:hover,.dd>button:hover{background:#fff2}
-.dd{position:relative}
-.dd .menu{display:none;position:absolute;right:0;top:100%;background:var(--kart);color:var(--yazi);min-width:190px;border-radius:10px;box-shadow:0 6px 20px #0003;padding:6px;z-index:20}
-.dd:hover .menu,.dd:focus-within .menu{display:block}
-.menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 12px;font:inherit;color:inherit;cursor:pointer;border-radius:6px}
-.menu button:hover{background:var(--krem)}
-.wrap{max-width:1100px;margin:auto;padding:24px 16px}
-h2.b{border-left:6px solid var(--sari);padding-left:10px;margin:8px 0 16px}
-.hero{background:linear-gradient(135deg,var(--krem),var(--zemin));text-align:center;padding:30px 16px}
-.hero img{width:130px;border-radius:50%;background:#fff;box-shadow:0 6px 20px #0002}
-.hero h1{color:var(--mavi);margin:10px 0 4px}
-@media (prefers-color-scheme:dark){.hero h1{color:var(--sari)}}
-.hero p{max-width:620px;margin:auto}
-.izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
-.vitrin{display:grid;grid-template-columns:2fr 1fr;gap:18px}
-.vitrin .kart:first-child{grid-row:span 2}
-@media (max-width:760px){.vitrin{grid-template-columns:1fr}.vitrin .kart:first-child{grid-row:auto}}
-.kart{background:var(--kart);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px #0001;display:flex;flex-direction:column}
-.kv{position:relative;height:170px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.kv span{font-size:3.2rem;filter:drop-shadow(0 2px 4px #0004)}
-.kv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;background:#fff}
-.vitrin .kart:first-child .kv{height:290px}
-.ic{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
-.ic h3{margin:0;font-size:1.05rem}
-.ic h3 a{text-decoration:none}.ic h3 a:hover{color:var(--acik)}
-.ic p{margin:0;flex:1;font-size:.93rem;opacity:.9}
-.ic small{opacity:.7}
-.et{display:inline-block;background:var(--acik);color:#fff;font-size:.75rem;padding:2px 10px;border-radius:12px;font-weight:600}
-.et.s{background:var(--sari);color:#1d2b3a}
-.btn{display:inline-block;background:var(--mavi);color:#fff;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;border:0;cursor:pointer;align-self:flex-start;margin-right:6px}
-.btn.s{background:var(--sari);color:#1d2b3a}
-.btn.g{background:#6b7785}
-.araclar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.araclar input,.araclar select{padding:10px 14px;border:2px solid var(--acik);border-radius:24px;font:inherit;background:var(--kart);color:var(--yazi)}
-.araclar input{flex:1;min-width:200px}
-.chip{border:2px solid var(--mavi);background:var(--kart);color:var(--mavi);padding:5px 14px;border-radius:20px;cursor:pointer;font-weight:600}
-.chip.on{background:var(--mavi);color:#fff}
-.sayfa{display:flex;gap:6px;justify-content:center;margin-top:22px;flex-wrap:wrap}
-#durum{text-align:center;opacity:.8}
-.detay{background:var(--kart);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px #0001}
-.detay .kv{height:300px}
-.detay .ic{padding:22px}
-.detay h1{margin:6px 0;color:var(--mavi)}
-@media (prefers-color-scheme:dark){.detay h1{color:var(--sari)}}
-.bilgi{background:var(--kart);border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}
-.yakinda{border:2px dashed var(--acik);text-align:center}
-#duyuru{background:var(--sari);color:#1d2b3a;padding:8px 16px;text-align:center;font-weight:600}
-#duyuru div{max-width:1100px;margin:2px auto}
-#duyuru a{text-decoration:underline}
-.menu .mb{font-size:.72rem;font-weight:700;opacity:.6;padding:8px 12px 2px;text-transform:uppercase}
-.btn.w{background:#25d366;color:#fff}
-.et.v{background:#c0392b}
-.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0}
-.gal img{width:100%;height:160px;object-fit:cover;border-radius:10px;background:#8883}
-.vd{position:relative;padding-top:56.25%;margin:12px 0}
-.vd iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:10px}
-.iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
-.etk{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #8883}
-.etk:last-child{border:0}
-.tg{background:var(--mavi);color:#fff;border-radius:10px;padding:4px 10px;text-align:center;min-width:56px;line-height:1.2}
-.pop a{display:block;padding:8px 0;border-bottom:1px solid #8883;text-decoration:none;font-weight:600}
-.pop a:last-child{border:0}
-.kose h3{margin-top:0}
-footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
-.ekip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:16px 0}
-.kisi{background:var(--kart);border-radius:14px;padding:18px;text-align:center;box-shadow:0 2px 10px #0001;border-top:5px solid var(--acik)}
-.kisi .ik{width:64px;height:64px;border-radius:50%;background:var(--mavi);color:#fff;font-size:1.4rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
-.kisi h3{margin:0 0 2px;font-size:1.05rem}
-.kisi p{margin:0;font-size:.92rem;opacity:.85}
-.randevu{background:var(--krem);border-left:6px solid var(--sari);border-radius:10px;padding:14px 18px;margin-top:6px}
-.randevu p{margin:4px 0}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(160deg,var(--krem),var(--zemin));color:var(--yazi);line-height:1.6}
+main{flex:1;max-width:820px;width:100%;margin:auto;padding:32px 16px;text-align:center}
+main>img{width:170px;max-width:55%;border-radius:50%;background:#fff;box-shadow:0 6px 20px #0002}
+h1{color:var(--mavi);margin:14px 0 4px;font-size:1.5rem}
+@media (prefers-color-scheme:dark){h1{color:var(--sari)}}
+.secim{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:26px}
+.sec{background:var(--kart);border-radius:16px;padding:24px 18px;text-decoration:none;color:inherit;box-shadow:0 4px 16px #0002;border-top:6px solid var(--sari);transition:transform .15s}
+.sec:hover,.sec:focus{transform:translateY(-4px);border-top-color:var(--acik)}
+.sec .ik{font-size:3rem}
+.sec h2{margin:6px 0;color:var(--mavi)}
+@media (prefers-color-scheme:dark){.sec h2{color:var(--sari)}}
+.sec p{margin:0 0 14px;font-size:.95rem;opacity:.9}
+.sec span.b{display:inline-block;background:var(--mavi);color:#fff;padding:9px 22px;border-radius:10px;font-weight:700}
+footer{background:var(--mavi);color:#fff;text-align:center;padding:16px}
 </style>
 </head>
 <body>
-<header><div class="bar">
-  <a href="#"><img src="logo.jpg" alt="Logo"><span>Şehit Polat Özbek İlkokulu<br>Rehberlik Servisi</span></a>
-  <nav>
-    <a href="#">Ana Sayfa</a>
-    <div class="dd"><button>Kategoriler ▾</button><div class="menu" id="menu"></div></div>
-    <a href="bep.html">BEP Hazırlayıcı</a>
-    <a href="yardim.html">Yardım</a>
-    <a href="#hakkimizda">Hakkımızda</a>
-  </nav>
-</div></header>
-<div id="duyuru" hidden></div>
-
-<main id="detay" class="wrap" hidden></main>
-
-<div id="ana">
-  <div class="hero"><img src="logo.jpg" alt="Logo"><h1>Rehberlik Servisi</h1>
-  <p>Veliler ve öğretmenlerimiz için hazırladığımız rehberlik içeriklerine buradan ulaşabilir, inceleyebilir ve indirebilirsiniz.</p></div>
-
-  <div class="wrap" id="vitrinKutu" hidden><h2 class="b">Son Eklenenler</h2><div class="vitrin" id="vitrin"></div></div>
-
-  <div class="wrap" id="ekPano" hidden><div class="iki">
-    <div id="etkKutu" hidden><h2 class="b">Yaklaşan Etkinlikler</h2><div class="bilgi" id="etkListe"></div></div>
-    <div id="popKutu" hidden><h2 class="b">Popüler İçerikler</h2><div class="bilgi pop" id="popListe"></div></div>
-  </div></div>
-
-  <div class="wrap"><h2 class="b">Köşelerimiz</h2><div class="izgara">
-    <div class="bilgi kose"><h3>🌱 Anasınıfı Veli Köşesi</h3><p>Okul öncesi dönemde okula uyum, ayrılık kaygısı, uyku ve beslenme düzeni gibi konularda veli yazıları, broşürler ve evde yapılabilecek etkinlikler.</p><button class="btn" onclick="kose('Anasınıfı')">İçeriklere git</button></div>
-    <div class="bilgi kose"><h3>🤝 Özel Eğitim ve Kaynaştırma Köşesi</h3><p>Özel eğitim ve kaynaştırma öğrencilerimizin aileleri ile öğretmenleri için bilgilendirme materyalleri, etkinlik önerileri ve rehber kaynaklar.</p><button class="btn" onclick="kose('Özel Eğitim')">İçeriklere git</button></div>
-  </div></div>
-
-  <div class="wrap" id="icerikler">
-    <h2 class="b">Tüm İçerikler</h2>
-    <div class="araclar"><input id="ara" type="search" placeholder="İçeriklerde ara..."><select id="katSec"></select></div>
-    <div class="araclar" id="seviyeler"></div>
-    <p id="durum">Yükleniyor...</p>
-    <div class="izgara" id="liste"></div>
-    <div class="sayfa" id="sayfa"></div>
+<main>
+  <img src="logo.jpg" alt="Şehit Polat Özbek İlkokulu Rehberlik Servisi logosu">
+  <h1>Şehit Polat Özbek İlkokulu<br>Rehberlik Servisi</h1>
+  <p>Lütfen giriş türünüzü seçin.</p>
+  <div class="secim">
+    <a class="sec" href="veli.html"><div class="ik">👨‍👩‍👧</div><h2>Veli Girişi</h2><p>Rehberlik içerikleri, broşürler, etkinlikler ve duyurular. Şifre gerekmez.</p><span class="b">Devam et</span></a>
+    <a class="sec" href="ogretmen.html"><div class="ik">🎓</div><h2>Öğretmen Girişi</h2><p>BEP Hazırlayıcı, öğretmenlere özel içerikler ve kılavuzlar. E-posta ve şifre ile giriş yapılır.</p><span class="b">Giriş yap</span></a>
   </div>
-
-  <div class="wrap" id="bep"><div class="bilgi" style="text-align:center"><h2 style="margin-top:0">BEP Hazırlayıcı</h2><p>Öğretmenlerimiz için MEB formatında BEP ve ZEP dosyası hazırlama programı.</p><a class="btn" href="bep.html">BEP Hazırlayıcıyı Aç</a></div></div>
-
-  <div class="wrap" style="padding-top:0"><section id="hakkimizda">
-  <h2>Hakkımızda</h2>
-  <div class="bilgi">
-    <p>Rehberlik Servisimiz 2019’dan bu yana öğrencilerimizin akademik, sosyal ve duygusal gelişimini; veli ve öğretmenlerimizle iş birliği içinde destekliyor. Her çocuğun kendine özgü olduğuna inanır, onların güvenle büyüyebileceği bir okul ortamı için çalışırız.</p>
-    <p>Okulumuzda <b>3 rehber öğretmen</b> görev yapmaktadır:</p>
-    <div class="ekip">
-      <div class="kisi"><div class="ik">YA</div><h3>Yasemin ACAY</h3><p>Rehber Öğretmen</p><p>İlkokul öğrencileri</p></div>
-      <div class="kisi"><div class="ik">HA</div><h3>Hande Nur AKALIN</h3><p>Rehber Öğretmen</p><p>İlkokul öğrencileri</p></div>
-      <div class="kisi"><div class="ik">UU</div><h3>Ulaş URKŞAŞ</h3><p>Rehber Öğretmen</p><p>Anasınıfları ve Özel Eğitim</p></div>
-    </div>
-    <h3>Bize Nasıl Ulaşırsınız?</h3>
-    <div class="randevu">
-      <p>🕘 <b>Görüşme saatleri:</b> Okul mesai saatleri içinde, 09.20 – 14.30</p>
-      <p>📅 <b>Randevu:</b> Rehberlik servisimizle görüşmek isteyen velilerimiz randevuyu sınıf rehber öğretmenlerinden alabilir.</p>
-    </div>
-  </div>
-</section></div>
-</div>
-
+</main>
 <footer>© Şehit Polat Özbek İlkokulu Rehberlik Servisi</footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCMWLEXorOncOjfVP6z8PQ0qu6zm49gNWw",
-  authDomain: "polatozbekrehberlik.firebaseapp.com",
-  projectId: "polatozbekrehberlik",
-  storageBucket: "polatozbekrehberlik.firebasestorage.app",
-  messagingSenderId: "260630742799",
-  appId: "1:260630742799:web:a8282da6bbe215e14f607a"
-};
-
-const ORNEK=[
- {id:"o1",baslik:"Okula Uyum Süreci",kategori:"Broşür",seviye:"Veliler",aciklama:"Yeni başlayan öğrenciler için uyum rehberi.",link:"#",tarih:"2026-10-01"},
- {id:"o2",baslik:"Sınıf İçi Davranış Yönetimi",kategori:"Doküman",seviye:"Öğretmenler",aciklama:"Sınıfta uygulanabilecek pratik stratejiler.",link:"#",tarih:"2026-09-15"},
- {id:"o3",baslik:"Haftalık Etkinlik Planı",kategori:"Etkinlik",seviye:"Anasınıfı",aciklama:"Okul öncesi için rehberlik etkinlikleri.",link:"#",tarih:"2026-09-10"}
-];
-const $=id=>document.getElementById(id);
-const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const guv=u=>/^https?:\/\//.test(u||"")?u:"#";
-const dID=u=>{const m=(u||"").match(/\/d\/([\w-]+)|[?&]id=([\w-]+)/);return m?(m[1]||m[2]):null};
-const GRAD=[["#1f5fa8","#12a0d0"],["#f5b818","#f08a24"],["#12a0d0","#5bd1b5"],["#7b4fb5","#1f5fa8"],["#e86a8a","#f5b818"]];
-const IKON={"Broşür":"📄","Etkinlik":"🎯","Form":"📝","Sunum":"🖥️","Doküman":"📚","Duyuru":"📢","Modüler Pano":"🧩","Görsel İçerik":"🖼️","Video":"🎬","Fotoğraf":"📷"};
-const SAYFA_BOY=9;
-let hepsi=[],sev="Tümü",kat="Tümü",sf=1;
-
-const kO=i=>i.kategoriler||(i.kategori?[i.kategori]:[]);
-const sO=i=>i.seviyeler||(i.seviye?[i.seviye]:[]);
-const yt=u=>{const m=(u||"").match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:null};
-function kapak(i){
-  const k0=kO(i)[0]||"x",g=GRAD[[...k0].reduce((a,c)=>a+c.charCodeAt(0),0)%GRAD.length];
-  const kd=dID(i.kapak),fd=dID((i.fotolar||[])[0]),y=yt(i.video),ld=dID(i.link);
-  const src=kd?`https://drive.google.com/thumbnail?id=${kd}&sz=w700`:fd?`https://drive.google.com/thumbnail?id=${fd}&sz=w700`:y?`https://img.youtube.com/vi/${y}/hqdefault.jpg`:ld?`https://drive.google.com/thumbnail?id=${ld}&sz=w700`:"";
-  const img=src?`<img loading="lazy" alt="" src="${src}" onerror="this.remove()">`:"";
-  return `<div class="kv" style="background:linear-gradient(135deg,${g[0]},${g[1]})"><span>${IKON[k0]||"✨"}</span>${img}</div>`;
-}
-function etk(i){
-  return kO(i).map(c=>`<span class="et">${esc(c)}</span>`).join(" ")+" "+
-    sO(i).filter(x=>x!=="Tüm Düzeyler").map(c=>`<span class="et s">${esc(c)}</span>`).join(" ")+(i.video?` <span class="et v">🎬 Video</span>`:"");
-}
-function gal(i){
-  const f=(i.fotolar||[]).map(dID).filter(Boolean);
-  return f.length?`<div class="gal">${f.map(d=>`<a href="https://drive.google.com/file/d/${d}/view"><img loading="lazy" alt="" src="https://drive.google.com/thumbnail?id=${d}&sz=w800"></a>`).join("")}</div>`:"";
-}
-function vid(u){
-  const y=yt(u),d=dID(u),s=y?`https://www.youtube-nocookie.com/embed/${y}`:d?`https://drive.google.com/file/d/${d}/preview`:"";
-  return s?`<div class="vd"><iframe src="${s}" allowfullscreen loading="lazy"></iframe></div>`:"";
-}
-function kart(i){
-  return `<article class="kart"><a href="#i=${esc(i.id)}">${kapak(i)}</a><div class="ic"><div>${etk(i)}</div>
-  <h3><a href="#i=${esc(i.id)}">${esc(i.baslik)}</a></h3><small>📅 ${esc(i.tarih)}</small><p>${esc(i.aciklama)}</p>
-  <a class="btn" href="#i=${esc(i.id)}">Devamını Oku</a></div></article>`;
-}
-
-function ciz(){
-  const q=$("ara").value.toLowerCase();
-  const s=hepsi.filter(i=>(sev==="Tümü"||sO(i).includes(sev)||sO(i).includes("Tüm Düzeyler"))&&(kat==="Tümü"||kO(i).includes(kat))&&
-    (i.baslik+" "+(i.aciklama||"")).toLowerCase().includes(q));
-  const top=Math.max(1,Math.ceil(s.length/SAYFA_BOY)); if(sf>top)sf=top;
-  $("liste").innerHTML=s.slice((sf-1)*SAYFA_BOY,sf*SAYFA_BOY).map(kart).join("");
-  $("durum").textContent=s.length?"":"Bu aramaya uygun içerik bulunamadı.";
-  const p=$("sayfa");p.innerHTML="";
-  if(top>1)for(let n=1;n<=top;n++){const b=document.createElement("button");b.className="chip"+(n===sf?" on":"");b.textContent=n;b.onclick=()=>{sf=n;ciz();$("icerikler").scrollIntoView()};p.appendChild(b)}
-}
-function filtreler(){
-  const sevL=["Tümü",...new Set(["Anasınıfı","İlkokul",...hepsi.flatMap(sO).filter(x=>x&&x!=="Tüm Düzeyler")])];
-  const katL=["Tümü",...new Set([...hepsi.flatMap(kO).filter(Boolean),"Modüler Pano","Veli e-Bülteni"])];
-  const sc=$("seviyeler");sc.innerHTML="";
-  sevL.forEach(c=>{const b=document.createElement("button");b.className="chip"+(c===sev?" on":"");b.textContent=c;b.onclick=()=>{sev=c;sf=1;filtreler();ciz()};sc.appendChild(b)});
-  $("katSec").innerHTML=katL.map(c=>`<option value="${esc(c)}"${c===kat?" selected":""}>${c==="Tümü"?"Tüm kategoriler":esc(c)}</option>`).join("");
-  const mn=$("menu");mn.innerHTML="";
-  const bas=t=>{const d=document.createElement("div");d.className="mb";d.textContent=t;mn.appendChild(d)};
-  const dugme=(t,fn)=>{const b=document.createElement("button");b.textContent=t;
-    b.onclick=()=>{location.hash="";fn();sf=1;filtreler();ciz();document.activeElement.blur();$("icerikler").scrollIntoView()};mn.appendChild(b)};
-  bas("Okul düzeyi");
-  dugme("Tüm içerikler",()=>{sev="Tümü";kat="Tümü"});
-  sevL.slice(1).forEach(c=>dugme(c,()=>{sev=c;kat="Tümü"}));
-  bas("İçerik türü");
-  katL.slice(1).forEach(c=>dugme(c,()=>{kat=c;sev="Tümü"}));
-}
-function detay(i){
-  const l=guv(i.link),id=dID(i.link),pu=location.origin+location.pathname+"#i="+i.id;
-  const ind=id?`https://drive.google.com/uc?export=download&id=${id}`:l;
-  $("detay").innerHTML=`<p><button class="btn g" onclick="geri()">← Geri dön</button></p>
-  <div class="detay">${kapak(i)}<div class="ic"><div>${etk(i)}</div><h1>${esc(i.baslik)}</h1><small>📅 ${esc(i.tarih)}</small>${vid(i.video)}${gal(i)}
-  <p style="white-space:pre-wrap;flex:none">${esc(i.aciklama)}</p>
-  ${i.link?`<div><a class="btn" href="${esc(l)}">İncele</a><a class="btn s" href="${esc(ind)}">İndir</a></div>`:""}
-  <div style="margin-top:8px"><a class="btn w" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(i.baslik+" "+pu)}">WhatsApp'ta paylaş</a><button class="btn g" onclick="kopyala()">Bağlantıyı kopyala</button></div></div></div>`;
-}
-function kopyala(){const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>alert("Bağlantı kopyalandı."),()=>prompt("Bağlantıyı kopyalayın:",u))}
-function geri(){history.length>1?history.back():(location.hash="")}
-function yonlendir(){
-  const m=location.hash.match(/^#i=(.+)$/),i=m&&hepsi.find(x=>x.id===m[1]);
-  $("detay").hidden=!i;$("ana").hidden=!!i;
-  if(i){detay(i);scrollTo(0,0);say(i)}
-}
-function kose(v){sev=v;kat="Tümü";sf=1;filtreler();ciz();$("icerikler").scrollIntoView()}
-function popCiz(){
-  const l=hepsi.filter(i=>i.goruntulenme>0).sort((a,b)=>b.goruntulenme-a.goruntulenme).slice(0,5);
-  if(!l.length)return;
-  $("popListe").innerHTML=l.map((i,n)=>`<a href="#i=${esc(i.id)}">${n+1}. ${esc(i.baslik)}<br><small>👁 ${i.goruntulenme} görüntülenme</small></a>`).join("");
-  $("popKutu").hidden=false;$("ekPano").hidden=false;
-}
-function say(i){
-  try{
-    if(!firebase.apps.length||i.id.length<10||sessionStorage.getItem("g"+i.id))return;
-    sessionStorage.setItem("g"+i.id,"1");
-    firebase.firestore().collection("icerikler").doc(i.id).update({goruntulenme:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
-  }catch(e){}
-}
-async function etkYukle(){
-  try{
-    const b=new Date().toISOString().slice(0,10),ay=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
-    const sn=await firebase.firestore().collection("etkinlikler").where("tarih",">=",b).orderBy("tarih").limit(5).get();
-    if(sn.empty)return;
-    $("etkListe").innerHTML=sn.docs.map(x=>{
-      const d=x.data(),t=new Date(d.tarih+"T00:00"),alt=[d.saat&&"🕘 "+esc(d.saat),d.yer&&"📍 "+esc(d.yer)].filter(Boolean).join(" · ");
-      return `<div class="etk"><div class="tg"><b>${t.getDate()}</b><br><small>${ay[t.getMonth()]}</small></div><div><b>${esc(d.baslik)}</b>${alt?`<br><small>${alt}</small>`:""}${d.aciklama?`<br><small>${esc(d.aciklama)}</small>`:""}</div></div>`}).join("");
-    $("etkKutu").hidden=false;$("ekPano").hidden=false;
-  }catch(e){}
-}
-async function duyuruYukle(){
-  try{
-    const bugun=new Date().toISOString().slice(0,10);
-    const sn=await firebase.firestore().collection("duyurular").orderBy("tarih","desc").limit(8).get();
-    const l=sn.docs.map(d=>d.data()).filter(d=>!d.bitis||d.bitis>=bugun).slice(0,3);
-    if(!l.length)return;
-    $("duyuru").innerHTML=l.map(d=>{const u=guv(d.link);return `<div>📢 ${u!=="#"?`<a href="${esc(u)}">${esc(d.metin)}</a>`:esc(d.metin)}</div>`}).join("");
-    $("duyuru").hidden=false;
-  }catch(e){}
-}
-async function yukle(){
-  try{
-    if(!firebaseConfig.apiKey)throw 0;
-    firebase.initializeApp(firebaseConfig);
-    const snap=await firebase.firestore().collection("icerikler").orderBy("tarih","desc").get();
-    hepsi=snap.docs.map(d=>({id:d.id,...d.data()}));
-  }catch(e){hepsi=ORNEK}
-  $("vitrinKutu").hidden=!hepsi.length;
-  $("vitrin").innerHTML=hepsi.slice(0,3).map(kart).join("");
-  filtreler();ciz();yonlendir();
-  popCiz();if(firebase.apps.length){duyuruYukle();etkYukle()}
-}
-$("ara").oninput=()=>{sf=1;ciz()};
-$("katSec").onchange=e=>{kat=e.target.value;sf=1;filtreler();ciz()};
-window.onhashchange=yonlendir;
-yukle();
-</script>
 </body>
 </html>

@@ -97,6 +97,7 @@ button.g{background:#777;margin:0}
 
     <div class="kutu">
       <h2 style="margin-top:0" id="formBaslik">Yeni içerik ekle</h2>
+      <label>Nerede görünsün?</label><select id="kitle"><option value="icerikler">Veli bölümü (herkese açık)</option><option value="ogretmenIcerikleri">Öğretmen bölümü (sadece giriş yapan öğretmenler)</option></select>
       <label>Başlık</label><input id="baslik">
       <label>Kategori (birden fazla seçebilirsin)</label><div class="cb" id="katBox"></div>
       <input id="katYeni" style="margin-top:8px" placeholder="Listede yoksa yeni kategori yaz (virgülle ayır)">
@@ -138,7 +139,7 @@ const SEVS=["Anasınıfı","İlkokul","Özel Eğitim"];
 const bugun=()=>new Date().toISOString().slice(0,10);
 const kO=d=>d.kategoriler||(d.kategori?[d.kategori]:[]);
 const sO=d=>{const s=d.seviyeler||(d.seviye?[d.seviye]:[]);return s.includes("Tüm Düzeyler")?SEVS:s};
-let duzenId=null,tumu=[];
+let duzenId=null,duzenKol=null,tumu=[];
 
 $("girisBtn").onclick=async()=>{
   $("girisMesaj").textContent="";
@@ -163,7 +164,7 @@ const sec=k=>[...$(k).querySelectorAll("input:checked")].map(c=>c.value);
 function mesaj(t,ok){const m=$("mesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
 
 function formSifirla(){
-  duzenId=null;
+  duzenId=null;duzenKol=null;$("kitle").value="icerikler";
   ["baslik","aciklama","link","video","fotolar","kapak","katYeni"].forEach(i=>$(i).value="");
   $("tarih").value=bugun();
   cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);
@@ -178,15 +179,17 @@ $("ekle").onclick=async()=>{
     aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),fotolar:$("fotolar").value.split("\n").map(x=>x.trim()).filter(Boolean),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun()};
   if(!d.baslik||!kategoriler.length||!seviyeler.length){mesaj("Başlık, en az bir kategori ve en az bir düzey zorunlu.",false);return}
   try{
-    if(duzenId){await db.collection("icerikler").doc(duzenId).update(d);formSifirla();mesaj("İçerik güncellendi.",true)}
-    else{await db.collection("icerikler").add(d);formSifirla();mesaj("İçerik eklendi.",true)}
+    const hk=$("kitle").value;
+    if(duzenId&&duzenKol===hk){await db.collection(hk).doc(duzenId).update(d);formSifirla();mesaj("İçerik güncellendi.",true)}
+    else if(duzenId){await db.collection(hk).add(d);await db.collection(duzenKol).doc(duzenId).delete();formSifirla();mesaj("İçerik yeni bölüme taşındı ve güncellendi.",true)}
+    else{await db.collection(hk).add(d);formSifirla();mesaj("İçerik eklendi.",true)}
     listele();
   }catch(e){mesaj("Kaydedilemedi. Güvenlik kuralını ve e-posta adresini kontrol et.",false)}
 };
 
 function duzenle(id){
   const d=tumu.find(x=>x.id===id);if(!d)return;
-  duzenId=id;
+  duzenId=id;duzenKol=d.kol||"icerikler";$("kitle").value=duzenKol;
   $("baslik").value=d.baslik||"";$("aciklama").value=d.aciklama||"";$("link").value=d.link||"";
   $("video").value=d.video||"";$("fotolar").value=(d.fotolar||[]).join("\n");$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
   cbCiz("katBox",KATS,kO(d));cbCiz("sevBox",SEVS,sO(d));
@@ -195,18 +198,18 @@ function duzenle(id){
 }
 
 async function listele(){
-  const sn=await db.collection("icerikler").orderBy("tarih","desc").get();
-  tumu=sn.docs.map(x=>({id:x.id,...x.data()}));
+  const [sv,so]=await Promise.all([db.collection("icerikler").orderBy("tarih","desc").get(),db.collection("ogretmenIcerikleri").orderBy("tarih","desc").get().catch(()=>({docs:[]}))]);
+  tumu=[...sv.docs.map(x=>({id:x.id,...x.data(),kol:"icerikler"})),...so.docs.map(x=>({id:x.id,...x.data(),kol:"ogretmenIcerikleri"}))].sort((x,y)=>(y.tarih||"").localeCompare(x.tarih||""));
   const l=$("liste");l.innerHTML="";
   if(!tumu.length){l.textContent="Henüz içerik yok.";return}
   tumu.forEach(d=>{
     const s=document.createElement("div");s.className="satir";
     s.innerHTML="<div><b></b><br><small></small></div><button class='d'>Düzenle</button><button class='k'>Sil</button>";
     s.querySelector("b").textContent=d.baslik;
-    s.querySelector("small").textContent=[kO(d).join(", "),sO(d).join(", "),d.tarih].filter(Boolean).join(" · ");
+    s.querySelector("small").textContent=[d.kol==="ogretmenIcerikleri"?"ÖĞRETMEN BÖLÜMÜ":"Veli bölümü",kO(d).join(", "),sO(d).join(", "),d.tarih].filter(Boolean).join(" · ");
     const [b1,b2]=s.querySelectorAll("button");
     b1.onclick=()=>duzenle(d.id);
-    b2.onclick=async()=>{if(!confirm("Bu içerik silinsin mi?"))return;await db.collection("icerikler").doc(d.id).delete();if(duzenId===d.id)formSifirla();listele()};
+    b2.onclick=async()=>{if(!confirm("Bu içerik silinsin mi?"))return;await db.collection(d.kol).doc(d.id).delete();if(duzenId===d.id)formSifirla();listele()};
     l.appendChild(s);
   });
 }

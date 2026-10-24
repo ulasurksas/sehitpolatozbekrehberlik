@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Şehit Polat Özbek İlkokulu Rehberlik Servisi</title>
+<link rel="icon" href="logo.jpg">
+<style>
+:root{--mavi:#1f5fa8;--acik:#12a0d0;--sari:#f5b818;--krem:#fff8e1;--yazi:#1d2b3a;--zemin:#f5f9fd;--kart:#fff}
+@media (prefers-color-scheme:dark){:root{--zemin:#101a26;--kart:#192636;--yazi:#e8eef5;--krem:#2a2616}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--zemin);color:var(--yazi);line-height:1.6}
+a{color:inherit}
+[hidden]{display:none!important}
+header{background:var(--mavi);color:#fff;position:sticky;top:0;z-index:10}
+.bar{max-width:1100px;margin:auto;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar>a{display:flex;align-items:center;gap:10px;text-decoration:none;flex:1;font-weight:700;line-height:1.2}
+.bar img{width:48px;height:48px;border-radius:50%;background:#fff}
+nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+nav>a,.dd>button{color:#fff;background:none;border:0;font:inherit;font-weight:600;padding:8px 12px;cursor:pointer;text-decoration:none;border-radius:8px}
+nav>a:hover,.dd>button:hover{background:#fff2}
+.dd{position:relative}
+.dd .menu{display:none;position:absolute;right:0;top:100%;background:var(--kart);color:var(--yazi);min-width:190px;border-radius:10px;box-shadow:0 6px 20px #0003;padding:6px;z-index:20}
+.dd:hover .menu,.dd:focus-within .menu{display:block}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 12px;font:inherit;color:inherit;cursor:pointer;border-radius:6px}
+.menu button:hover{background:var(--krem)}
+.wrap{max-width:1100px;margin:auto;padding:24px 16px}
+h2.b{border-left:6px solid var(--sari);padding-left:10px;margin:8px 0 16px}
+.hero{background:linear-gradient(135deg,var(--krem),var(--zemin));text-align:center;padding:30px 16px}
+.hero img{width:130px;border-radius:50%;background:#fff;box-shadow:0 6px 20px #0002}
+.hero h1{color:var(--mavi);margin:10px 0 4px}
+@media (prefers-color-scheme:dark){.hero h1{color:var(--sari)}}
+.hero p{max-width:620px;margin:auto}
+.izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.vitrin{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+.vitrin .kart:first-child{grid-row:span 2}
+@media (max-width:760px){.vitrin{grid-template-columns:1fr}.vitrin .kart:first-child{grid-row:auto}}
+.kart{background:var(--kart);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px #0001;display:flex;flex-direction:column}
+.kv{position:relative;height:170px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.kv span{font-size:3.2rem;filter:drop-shadow(0 2px 4px #0004)}
+.kv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;background:#fff}
+.vitrin .kart:first-child .kv{height:290px}
+.ic{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.ic h3{margin:0;font-size:1.05rem}
+.ic h3 a{text-decoration:none}.ic h3 a:hover{color:var(--acik)}
+.ic p{margin:0;flex:1;font-size:.93rem;opacity:.9}
+.ic small{opacity:.7}
+.et{display:inline-block;background:var(--acik);color:#fff;font-size:.75rem;padding:2px 10px;border-radius:12px;font-weight:600}
+.et.s{background:var(--sari);color:#1d2b3a}
+.btn{display:inline-block;background:var(--mavi);color:#fff;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;border:0;cursor:pointer;align-self:flex-start;margin-right:6px}
+.btn.s{background:var(--sari);color:#1d2b3a}
+.btn.g{background:#6b7785}
+.araclar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.araclar input,.araclar select{padding:10px 14px;border:2px solid var(--acik);border-radius:24px;font:inherit;background:var(--kart);color:var(--yazi)}
+.araclar input{flex:1;min-width:200px}
+.chip{border:2px solid var(--mavi);background:var(--kart);color:var(--mavi);padding:5px 14px;border-radius:20px;cursor:pointer;font-weight:600}
+.chip.on{background:var(--mavi);color:#fff}
+.sayfa{display:flex;gap:6px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+#durum{text-align:center;opacity:.8}
+.detay{background:var(--kart);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px #0001}
+.detay .kv{height:300px}
+.detay .ic{padding:22px}
+.detay h1{margin:6px 0;color:var(--mavi)}
+@media (prefers-color-scheme:dark){.detay h1{color:var(--sari)}}
+.bilgi{background:var(--kart);border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}
+.yakinda{border:2px dashed var(--acik);text-align:center}
+#duyuru{background:var(--sari);color:#1d2b3a;padding:8px 16px;text-align:center;font-weight:600}
+#duyuru div{max-width:1100px;margin:2px auto}
+#duyuru a{text-decoration:underline}
+.menu .mb{font-size:.72rem;font-weight:700;opacity:.6;padding:8px 12px 2px;text-transform:uppercase}
+.btn.w{background:#25d366;color:#fff}
+.et.v{background:#c0392b}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0}
+.gal img{width:100%;height:160px;object-fit:cover;border-radius:10px;background:#8883}
+.vd{position:relative;padding-top:56.25%;margin:12px 0}
+.vd iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:10px}
+.iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.etk{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #8883}
+.etk:last-child{border:0}
+.tg{background:var(--mavi);color:#fff;border-radius:10px;padding:4px 10px;text-align:center;min-width:56px;line-height:1.2}
+.pop a{display:block;padding:8px 0;border-bottom:1px solid #8883;text-decoration:none;font-weight:600}
+.pop a:last-child{border:0}
+.kose h3{margin-top:0}
+footer{background:var(--mavi);color:#fff;text-align:center;padding:18px;margin-top:20px}
+.ekip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:16px 0}
+.kisi{background:var(--kart);border-radius:14px;padding:18px;text-align:center;box-shadow:0 2px 10px #0001;border-top:5px solid var(--acik)}
+.kisi .ik{width:64px;height:64px;border-radius:50%;background:var(--mavi);color:#fff;font-size:1.4rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.kisi h3{margin:0 0 2px;font-size:1.05rem}
+.kisi p{margin:0;font-size:.92rem;opacity:.85}
+.randevu{background:var(--krem);border-left:6px solid var(--sari);border-radius:10px;padding:14px 18px;margin-top:6px}
+.randevu p{margin:4px 0}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <a href="#"><img src="logo.jpg" alt="Logo"><span>Şehit Polat Özbek İlkokulu<br>Rehberlik Servisi</span></a>
+  <nav>
+    <a href="#">Ana Sayfa</a>
+    <div class="dd"><button>Kategoriler ▾</button><div class="menu" id="menu"></div></div>
+    <a href="ogretmen.html">Öğretmen Girişi</a>
+    <a href="yardim.html">Yardım</a>
+    <a href="#hakkimizda">Hakkımızda</a>
+  </nav>
+</div></header>
+<div id="duyuru" hidden></div>
+
+<main id="detay" class="wrap" hidden></main>
+
+<div id="ana">
+  <div class="hero"><img src="logo.jpg" alt="Logo"><h1>Rehberlik Servisi</h1>
+  <p>Veliler ve öğretmenlerimiz için hazırladığımız rehberlik içeriklerine buradan ulaşabilir, inceleyebilir ve indirebilirsiniz.</p></div>
+
+  <div class="wrap" id="vitrinKutu" hidden><h2 class="b">Son Eklenenler</h2><div class="vitrin" id="vitrin"></div></div>
+
+  <div class="wrap" id="ekPano" hidden><div class="iki">
+    <div id="etkKutu" hidden><h2 class="b">Yaklaşan Etkinlikler</h2><div class="bilgi" id="etkListe"></div></div>
+    <div id="popKutu" hidden><h2 class="b">Popüler İçerikler</h2><div class="bilgi pop" id="popListe"></div></div>
+  </div></div>
+
+  <div class="wrap"><h2 class="b">Köşelerimiz</h2><div class="izgara">
+    <div class="bilgi kose"><h3>🌱 Anasınıfı Veli Köşesi</h3><p>Okul öncesi dönemde okula uyum, ayrılık kaygısı, uyku ve beslenme düzeni gibi konularda veli yazıları, broşürler ve evde yapılabilecek etkinlikler.</p><button class="btn" onclick="kose('Anasınıfı')">İçeriklere git</button></div>
+    <div class="bilgi kose"><h3>🤝 Özel Eğitim ve Kaynaştırma Köşesi</h3><p>Özel eğitim ve kaynaştırma öğrencilerimizin aileleri ile öğretmenleri için bilgilendirme materyalleri, etkinlik önerileri ve rehber kaynaklar.</p><button class="btn" onclick="kose('Özel Eğitim')">İçeriklere git</button></div>
+  </div></div>
+
+  <div class="wrap" id="icerikler">
+    <h2 class="b">Tüm İçerikler</h2>
+    <div class="araclar"><input id="ara" type="search" placeholder="İçeriklerde ara..."><select id="katSec"></select></div>
+    <div class="araclar" id="seviyeler"></div>
+    <p id="durum">Yükleniyor...</p>
+    <div class="izgara" id="liste"></div>
+    <div class="sayfa" id="sayfa"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:0"><section id="hakkimizda">
+  <h2>Hakkımızda</h2>
+  <div class="bilgi">
+    <p>Rehberlik Servisimiz 2019’dan bu yana öğrencilerimizin akademik, sosyal ve duygusal gelişimini; veli ve öğretmenlerimizle iş birliği içinde destekliyor. Her çocuğun kendine özgü olduğuna inanır, onların güvenle büyüyebileceği bir okul ortamı için çalışırız.</p>
+    <p>Okulumuzda <b>3 rehber öğretmen</b> görev yapmaktadır:</p>
+    <div class="ekip">
+      <div class="kisi"><div class="ik">YA</div><h3>Yasemin ACAY</h3><p>Rehber Öğretmen</p><p>İlkokul öğrencileri</p></div>
+      <div class="kisi"><div class="ik">HA</div><h3>Hande Nur AKALIN</h3><p>Rehber Öğretmen</p><p>İlkokul öğrencileri</p></div>
+      <div class="kisi"><div class="ik">UU</div><h3>Ulaş URKŞAŞ</h3><p>Rehber Öğretmen</p><p>Anasınıfları ve Özel Eğitim</p></div>
+    </div>
+    <h3>Bize Nasıl Ulaşırsınız?</h3>
+    <div class="randevu">
+      <p>🕘 <b>Görüşme saatleri:</b> Okul mesai saatleri içinde, 09.20 – 14.30</p>
+      <p>📅 <b>Randevu:</b> Rehberlik servisimizle görüşmek isteyen velilerimiz randevuyu sınıf rehber öğretmenlerinden alabilir.</p>
+    </div>
+  </div>
+</section></div>
+</div>
+
+<footer>© Şehit Polat Özbek İlkokulu Rehberlik Servisi</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>window.KUTUPHANE={koleksiyon:"icerikler"};</script>
+<script src="kutuphane.js"></script>
+</body>
+</html>
