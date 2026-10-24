@@ -47,6 +47,17 @@ button.g{background:#777;margin:0}
 
   <div id="panel" hidden>
     <div class="kutu">
+      <h2 style="margin-top:0">Öğretmenler ve BEP erişimi</h2>
+      <p style="margin-top:0">Buraya eklenen öğretmenler BEP Hazırlayıcı'ya girebilir. Yeni öğretmen eklediğinde e-postasına şifre belirleme bağlantısı gider.</p>
+      <label>Öğretmenin e-posta adresi</label><input id="oEposta" type="email">
+      <label>Ad Soyad</label><input id="oAd">
+      <label>Sorumlu olduğu sınıflar (birden fazla seçebilirsin)</label>
+      <div id="oSiniflar"></div>
+      <button id="oKaydet">Öğretmeni kaydet</button> <button class="g" id="oIptal" hidden>Vazgeç</button>
+      <div id="oMesaj"></div>
+      <div id="oListe" style="margin-top:12px"></div>
+    </div>
+    <div class="kutu">
       <h2 style="margin-top:0">Duyuru ekle (ana sayfanın üstünde görünür)</h2>
       <label>Duyuru metni</label><input id="dMetin" maxlength="140" placeholder="Örn: Veli seminerimiz Cuma saat 14.00'te">
       <label>Bağlantı (isteğe bağlı)</label><input id="dLink" placeholder="https://...">
@@ -121,7 +132,7 @@ $("girisBtn").onclick=async()=>{
 $("cikis").onclick=()=>auth.signOut();
 auth.onAuthStateChanged(u=>{
   $("girisKutu").hidden=!!u;$("panel").hidden=!u;$("cikis").hidden=!u;
-  if(u){formSifirla();listele();dListele();eListele()}
+  if(u){formSifirla();listele();dListele();eListele();oSifirla();oListele()}
 });
 
 function cbCiz(kutu,liste,secili){
@@ -231,6 +242,75 @@ async function eListele(){
       s.querySelector("b").textContent=d.baslik;
       s.querySelector("small").textContent=[d.tarih,d.saat,d.yer].filter(Boolean).join(" · ");
       s.querySelector("button").onclick=async()=>{if(confirm("Etkinlik silinsin mi?")){await doc.ref.delete();eListele()}};
+      l.appendChild(s);
+    });
+  }catch(e){l.textContent=""}
+}
+
+const CFG={apiKey:"AIzaSyCMWLEXorOncOjfVP6z8PQ0qu6zm49gNWw",authDomain:"polatozbekrehberlik.firebaseapp.com",projectId:"polatozbekrehberlik",storageBucket:"polatozbekrehberlik.firebasestorage.app",messagingSenderId:"260630742799",appId:"1:260630742799:web:a8282da6bbe215e14f607a"};
+const GRUPLAR=[
+  ["Anasınıfı (60-72 ay)",["A","B","C","D","E","F"].map(x=>"Anasınıfı "+x)],
+  ["1. Sınıf",[..."ABCDEFG"].map(x=>"1"+x)],
+  ["2. Sınıf",[..."ABCDEFG"].map(x=>"2"+x)],
+  ["3. Sınıf",[..."ABCDEFG"].map(x=>"3"+x)],
+  ["4. Sınıf",[..."ABCDEFG"].map(x=>"4"+x)],
+  ["Özel Eğitim",["Hafif Düzey Otizm Sınıfı","Hafif Düzey Zihinsel Yetersizlik Sınıfı"]]
+];
+let oDuzen=null,oTumu=[];
+function oMesaj(t,ok){const m=$("oMesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
+function oSinifCiz(secili){
+  const k=$("oSiniflar");k.innerHTML="";
+  GRUPLAR.forEach(([ad,liste])=>{
+    const b=document.createElement("div");b.style.fontWeight="700";b.style.margin="10px 0 4px";b.textContent=ad;k.appendChild(b);
+    const c=document.createElement("div");c.className="cb";
+    liste.forEach(v=>{const l=document.createElement("label"),i=document.createElement("input");i.type="checkbox";i.value=v;i.checked=secili.includes(v);l.appendChild(i);l.append(" "+v);c.appendChild(l)});
+    k.appendChild(c);
+  });
+}
+function oSifirla(){
+  oDuzen=null;$("oEposta").value="";$("oEposta").disabled=false;$("oAd").value="";oSinifCiz([]);
+  $("oKaydet").textContent="Öğretmeni kaydet";$("oIptal").hidden=true;
+}
+$("oIptal").onclick=()=>{oSifirla();oMesaj("",true)};
+const rastgele=()=>btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(18))));
+$("oKaydet").onclick=async()=>{
+  const e=$("oEposta").value.trim().toLowerCase(),ad=$("oAd").value.trim();
+  const siniflar=[...$("oSiniflar").querySelectorAll("input:checked")].map(c=>c.value);
+  if(!e||!ad||!siniflar.length){oMesaj("E-posta, ad soyad ve en az bir sınıf zorunlu.",false);return}
+  try{
+    await db.collection("ogretmenler").doc(e).set({eposta:e,ad,siniflar});
+    if(!oDuzen){
+      const ik=firebase.apps.find(x=>x.name==="ikinci")||firebase.initializeApp(CFG,"ikinci");
+      try{
+        await ik.auth().createUserWithEmailAndPassword(e,rastgele());
+        await ik.auth().sendPasswordResetEmail(e);
+        await ik.auth().signOut();
+        oMesaj("Kaydedildi. Öğretmenin e-postasına şifre belirleme bağlantısı gönderildi.",true);
+      }catch(err){
+        if(err.code==="auth/email-already-in-use")oMesaj("Kaydedildi. Bu e-posta için hesap zaten var; gerekirse listeden şifre e-postası gönder.",true);
+        else oMesaj("Yetki kaydedildi ama hesap oluşturulamadı: "+(err.code||err.message),false);
+      }
+    }else oMesaj("Öğretmen güncellendi.",true);
+    oSifirla();oListele();
+  }catch(e2){oMesaj("Kaydedilemedi. Güvenlik kuralını kontrol et.",false)}
+};
+async function oListele(){
+  const l=$("oListe");
+  try{
+    const sn=await db.collection("ogretmenler").get();
+    oTumu=sn.docs.map(d=>d.data()).sort((x,y)=>(x.ad||"").localeCompare(y.ad||"","tr"));
+    l.innerHTML="";
+    if(!oTumu.length){l.textContent="Henüz öğretmen eklenmedi.";return}
+    oTumu.forEach(d=>{
+      const s=document.createElement("div");s.className="satir";
+      s.innerHTML="<div><b></b><br><small></small></div><button class='d'>Düzenle</button><button class='g' style='padding:6px 12px;font-size:.85rem'>Şifre e-postası</button><button class='k'>Sil</button>";
+      s.querySelector("b").textContent=d.ad;
+      s.querySelector("small").textContent=d.eposta+" · "+(d.siniflar||[]).join(", ");
+      const [b1,b2,b3]=s.querySelectorAll("button");
+      b1.onclick=()=>{oDuzen=d.eposta;$("oEposta").value=d.eposta;$("oEposta").disabled=true;$("oAd").value=d.ad||"";oSinifCiz(d.siniflar||[]);
+        $("oKaydet").textContent="Değişiklikleri kaydet";$("oIptal").hidden=false;oMesaj("",true);$("oEposta").scrollIntoView({behavior:"smooth",block:"center"})};
+      b2.onclick=async()=>{try{await auth.sendPasswordResetEmail(d.eposta);oMesaj("Şifre belirleme e-postası gönderildi: "+d.eposta,true)}catch(x){oMesaj("E-posta gönderilemedi.",false)}};
+      b3.onclick=async()=>{if(!confirm(d.ad+" için BEP erişimi kaldırılsın mı?"))return;await db.collection("ogretmenler").doc(d.eposta).delete();if(oDuzen===d.eposta)oSifirla();oListele()};
       l.appendChild(s);
     });
   }catch(e){l.textContent=""}
