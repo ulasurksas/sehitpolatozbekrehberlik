@@ -66,6 +66,11 @@ button.g{background:#777;margin:0}
       <h2 style="margin-top:0">BEP dosyaları (sınıflara göre)</h2>
       <p style="margin-top:0">Dosyayı açıp düzenlemek için yönetici hesabınla <a href="bep.html" target="_blank">BEP Hazırlayıcı</a>'ya gir; tüm sınıfların dosyalarını orada görürsün. Burada sınıflara göre listeyi görebilir ve gerekirse dosya silebilirsin.</p>
       <button id="bYenile">Listeyi getir</button>
+      <button id="bYedek" class="d" style="padding:10px 18px;font-size:1rem">Tüm BEP dosyalarını yedekle (indir)</button>
+      <button id="bGeriBtn" class="g">Yedekten geri yükle</button>
+      <input type="file" id="bGeriYukle" accept=".json" hidden>
+      <p style="font-size:.88rem;opacity:.85">Yedek dosyası tüm öğrencilerin bilgilerini, öğretmen listesini ve öğretmenlerin okul bilgilerini içerir. Güvenli bir yerde sakla, herkesle paylaşma. Geri yükleme, aynı kayıtların eski hâlini üzerine yazar.</p>
+      <div id="bMesaj"></div>
       <div id="bListe" style="margin-top:12px"></div>
     </div>
     <div class="kutu">
@@ -351,6 +356,42 @@ async function bListele(){
 $("bYenile").onclick=bListele;
 document.querySelectorAll("#panel .kutu").forEach(k=>{k.classList.add("kapali");k.querySelector("h2").onclick=()=>k.classList.toggle("kapali")});
 const ac=el=>el.closest(".kutu").classList.remove("kapali");
+
+function bMesaj(t,ok){const m=$("bMesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
+function indir(ad,veri){
+  const x=document.createElement("a");x.href=URL.createObjectURL(new Blob([JSON.stringify(veri)],{type:"application/json"}));
+  x.download=ad;document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(x.href),3000);
+}
+$("bYedek").onclick=async()=>{
+  bMesaj("Yedek hazırlanıyor...",true);
+  try{
+    const [sb,so]=await Promise.all([db.collection("bepOgrenciler").get(),db.collection("ogretmenler").get()]);
+    const kayitlar=sb.docs.map(d=>({id:d.id,...d.data()})),ogrenciler=[];
+    kayitlar.forEach(k=>{try{ogrenciler.push(JSON.parse(k.veri))}catch(e){}});
+    const ogretmenler=so.docs.map(d=>d.data()),ayarlarKv={};
+    for(const o of ogretmenler){
+      const kv=await db.collection("bepKullanici").doc(o.eposta).collection("kv").get();
+      if(!kv.empty){ayarlarKv[o.eposta]={};kv.docs.forEach(d=>{ayarlarKv[o.eposta][d.id]=d.data().v})}
+    }
+    indir("BEP_Sunucu_Yedegi_"+bugun()+".json",{uygulama:"BEP Hazırlayıcı",surum:1,sunucuYedegi:true,tarih:new Date().toISOString(),ayarlar:null,ozelBanka:null,ogrenciler,sunucuKayitlari:kayitlar,ogretmenler,ayarlarKv});
+    bMesaj("Yedek indirildi: "+kayitlar.length+" BEP dosyası, "+ogretmenler.length+" öğretmen.",true);
+  }catch(e){bMesaj("Yedek alınamadı. Güvenlik kuralını ve bağlantını kontrol et.",false)}
+};
+$("bGeriBtn").onclick=()=>$("bGeriYukle").click();
+$("bGeriYukle").onchange=async ev=>{
+  const f=ev.target.files[0];if(!f)return;
+  try{
+    const y=JSON.parse(await f.text());
+    if(!y.sunucuYedegi||!Array.isArray(y.sunucuKayitlari))throw new Error("Bu dosya bir sunucu yedeği değil.");
+    if(!confirm(y.sunucuKayitlari.length+" BEP dosyası ve "+(y.ogretmenler||[]).length+" öğretmen kaydı geri yüklensin mi? Aynı kayıtların güncel hâlinin üzerine yazılır."))return;
+    bMesaj("Geri yükleniyor...",true);
+    for(const k of y.sunucuKayitlari){const {id,...r}=k;await db.collection("bepOgrenciler").doc(id).set(r)}
+    for(const o of y.ogretmenler||[])await db.collection("ogretmenler").doc(o.eposta).set(o);
+    for(const [em,kv] of Object.entries(y.ayarlarKv||{}))for(const [an,v] of Object.entries(kv))await db.collection("bepKullanici").doc(em).collection("kv").doc(an).set({v});
+    bMesaj("Geri yükleme tamamlandı.",true);bListele();oListele();
+  }catch(e){bMesaj("Geri yüklenemedi: "+(e.message||"dosya okunamadı"),false)}
+  ev.target.value="";
+};
 </script>
 </body>
 </html>
