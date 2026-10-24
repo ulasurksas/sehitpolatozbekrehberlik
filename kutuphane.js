@@ -34,7 +34,7 @@ function kapak(i){
 }
 function etk(i){
   return kO(i).map(c=>`<span class="et">${esc(c)}</span>`).join(" ")+" "+
-    sO(i).filter(x=>x!=="Tüm Düzeyler").map(c=>`<span class="et s">${esc(c)}</span>`).join(" ")+(i.video?` <span class="et v">🎬 Video</span>`:"");
+    sO(i).filter(x=>x!=="Tüm Düzeyler").map(c=>`<span class="et s">${esc(c)}</span>`).join(" ")+(i.video?` <span class="et v">🎬 Video</span>`:"")+(i.onecikan?` <span class="et p">📌 Öne çıkan</span>`:"");
 }
 function gal(i){
   const f=(i.fotolar||[]).map(dID).filter(Boolean);
@@ -92,6 +92,7 @@ function yonlendir(){
   $("detay").hidden=!i;$("ana").hidden=!!i;
   if(i){detay(i);scrollTo(0,0);if(OZ.populer!==false)say(i)}
 }
+function hizli(t,v){if(t==="s"){sev=v;kat="Tümü"}else{kat=v;sev="Tümü"}sf=1;filtreler();ciz();$("icerikler").scrollIntoView()}
 function kose(v){sev=v;kat="Tümü";sf=1;filtreler();ciz();$("icerikler").scrollIntoView()}
 function popCiz(){
   const l=hepsi.filter(i=>i.goruntulenme>0).sort((a,b)=>b.goruntulenme-a.goruntulenme).slice(0,5);
@@ -136,11 +137,12 @@ async function yukle(){
     hepsi=snap.docs.map(d=>({id:d.id,...d.data()}));
   }catch(e){hepsi=OZ.ornek===false?[]:ORNEK}
   $("vitrinKutu").hidden=!hepsi.length;
-  $("vitrin").innerHTML=hepsi.slice(0,3).map(kart).join("");
+  $("vitrin").innerHTML=[...hepsi].sort((a,b)=>(b.onecikan?1:0)-(a.onecikan?1:0)).slice(0,3).map(kart).join("");
   filtreler();ciz();yonlendir();
   if(OZ.populer!==false)popCiz();if(firebase.apps.length&&OZ.duyuru!==false){duyuruYukle();etkYukle()}
 }
 $("ara").oninput=()=>{sf=1;ciz()};
 $("katSec").onchange=e=>{kat=e.target.value;sf=1;filtreler();ciz()};
 window.onhashchange=yonlendir;
+try{$("liste").innerHTML='<div class="sk"></div>'.repeat(6);$("durum").textContent=""}catch(e){}
 yukle();

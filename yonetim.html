@@ -108,6 +108,7 @@ button.g{background:#777;margin:0}
       <label>Fotoğraf bağlantıları (isteğe bağlı, her satıra bir Drive görsel linki)</label><textarea id="fotolar" rows="3" placeholder="https://drive.google.com/file/d/..."></textarea>
       <label>Kapak görseli bağlantısı (isteğe bağlı, boşsa otomatik oluşur)</label><input id="kapak" placeholder="Drive görsel linki">
       <label>Tarih</label><input id="tarih" type="date">
+      <label style="display:flex;gap:8px;align-items:center;font-weight:500"><input type="checkbox" id="onecikan" style="width:auto"> Vitrinde en başa sabitle (öne çıkan)</label>
       <button id="ekle">İçeriği ekle</button> <button class="g" id="iptal" hidden>Vazgeç</button>
       <div id="mesaj"></div>
     </div>
@@ -166,7 +167,7 @@ function mesaj(t,ok){const m=$("mesaj");m.textContent=t;m.className=ok?"tamam":"
 function formSifirla(){
   duzenId=null;duzenKol=null;$("kitle").value="icerikler";
   ["baslik","aciklama","link","video","fotolar","kapak","katYeni"].forEach(i=>$(i).value="");
-  $("tarih").value=bugun();
+  $("tarih").value=bugun();$("onecikan").checked=false;
   cbCiz("katBox",KATS,[]);cbCiz("sevBox",SEVS,[]);
   $("formBaslik").textContent="Yeni içerik ekle";$("ekle").textContent="İçeriği ekle";$("iptal").hidden=true;
 }
@@ -176,7 +177,7 @@ $("ekle").onclick=async()=>{
   const yeni=$("katYeni").value.split(",").map(x=>x.trim()).filter(Boolean);
   const kategoriler=[...new Set([...sec("katBox"),...yeni])],seviyeler=sec("sevBox");
   const d={baslik:$("baslik").value.trim(),kategoriler,seviyeler,kategori:kategoriler[0]||"",seviye:seviyeler[0]||"",
-    aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),fotolar:$("fotolar").value.split("\n").map(x=>x.trim()).filter(Boolean),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun()};
+    aciklama:$("aciklama").value.trim(),link:$("link").value.trim(),video:$("video").value.trim(),fotolar:$("fotolar").value.split("\n").map(x=>x.trim()).filter(Boolean),kapak:$("kapak").value.trim(),tarih:$("tarih").value||bugun(),onecikan:$("onecikan").checked};
   if(!d.baslik||!kategoriler.length||!seviyeler.length){mesaj("Başlık, en az bir kategori ve en az bir düzey zorunlu.",false);return}
   try{
     const hk=$("kitle").value;
@@ -191,7 +192,7 @@ function duzenle(id){
   const d=tumu.find(x=>x.id===id);if(!d)return;
   duzenId=id;duzenKol=d.kol||"icerikler";$("kitle").value=duzenKol;
   $("baslik").value=d.baslik||"";$("aciklama").value=d.aciklama||"";$("link").value=d.link||"";
-  $("video").value=d.video||"";$("fotolar").value=(d.fotolar||[]).join("\n");$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
+  $("video").value=d.video||"";$("fotolar").value=(d.fotolar||[]).join("\n");$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("onecikan").checked=!!d.onecikan;$("katYeni").value="";
   cbCiz("katBox",KATS,kO(d));cbCiz("sevBox",SEVS,sO(d));
   $("formBaslik").textContent="İçeriği düzenle";$("ekle").textContent="Değişiklikleri kaydet";$("iptal").hidden=false;
   mesaj("",true);ac($("formBaslik"));$("formBaslik").scrollIntoView({behavior:"smooth"});
@@ -205,7 +206,7 @@ async function listele(){
   tumu.forEach(d=>{
     const s=document.createElement("div");s.className="satir";
     s.innerHTML="<div><b></b><br><small></small></div><button class='d'>Düzenle</button><button class='k'>Sil</button>";
-    s.querySelector("b").textContent=d.baslik;
+    s.querySelector("b").textContent=(d.onecikan?"📌 ":"")+d.baslik;
     s.querySelector("small").textContent=[d.kol==="ogretmenIcerikleri"?"ÖĞRETMEN BÖLÜMÜ":"Veli bölümü",kO(d).join(", "),sO(d).join(", "),d.tarih].filter(Boolean).join(" · ");
     const [b1,b2]=s.querySelectorAll("button");
     b1.onclick=()=>duzenle(d.id);
