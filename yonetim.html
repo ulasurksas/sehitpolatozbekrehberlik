@@ -58,6 +58,7 @@ button.g{background:#777;margin:0}
       <label>Ad Soyad</label><input id="oAd">
       <label>Sorumlu olduğu sınıflar (birden fazla seçebilirsin)</label>
       <div id="oSiniflar"></div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:500;margin-top:12px"><input type="checkbox" id="oRehber" style="width:auto"> Rehber yetkisi (tüm sınıfların BEP dosyalarını görebilir ve düzenleyebilir)</label>
       <button id="oKaydet">Öğretmeni kaydet</button> <button class="g" id="oIptal" hidden>Vazgeç</button>
       <div id="oMesaj"></div>
       <div id="oListe" style="margin-top:12px"></div>
@@ -280,15 +281,19 @@ let oDuzen=null,oTumu=[];
 function oMesaj(t,ok){const m=$("oMesaj");m.textContent=t;m.className=ok?"tamam":"hata"}
 function oSinifCiz(secili){
   const k=$("oSiniflar");k.innerHTML="";
+  const tum=document.createElement("button");tum.type="button";tum.className="g";tum.style.cssText="margin:0 0 6px;padding:6px 12px;font-size:.85rem";tum.textContent="Tüm sınıfları seç / kaldır";
+  tum.onclick=()=>{const ks=[...k.querySelectorAll("input")];const h=ks.every(x=>x.checked);ks.forEach(x=>x.checked=!h)};k.appendChild(tum);
   GRUPLAR.forEach(([ad,liste])=>{
     const b=document.createElement("div");b.style.fontWeight="700";b.style.margin="10px 0 4px";b.textContent=ad;k.appendChild(b);
     const c=document.createElement("div");c.className="cb";
     liste.forEach(v=>{const l=document.createElement("label"),i=document.createElement("input");i.type="checkbox";i.value=v;i.checked=secili.includes(v);l.appendChild(i);l.append(" "+v);c.appendChild(l)});
+    const t=document.createElement("button");t.type="button";t.className="g";t.style.cssText="margin:0 0 0 10px;padding:2px 10px;font-size:.8rem";t.textContent="Tümünü seç / kaldır";
+    t.onclick=()=>{const ks=[...c.querySelectorAll("input")];const h=ks.every(x=>x.checked);ks.forEach(x=>x.checked=!h)};b.appendChild(t);
     k.appendChild(c);
   });
 }
 function oSifirla(){
-  oDuzen=null;$("oEposta").value="";$("oEposta").disabled=false;$("oAd").value="";oSinifCiz([]);
+  oDuzen=null;$("oEposta").value="";$("oEposta").disabled=false;$("oAd").value="";$("oRehber").checked=false;oSinifCiz([]);
   $("oKaydet").textContent="Öğretmeni kaydet";$("oIptal").hidden=true;
 }
 $("oIptal").onclick=()=>{oSifirla();oMesaj("",true)};
@@ -296,9 +301,10 @@ const rastgele=()=>btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8A
 $("oKaydet").onclick=async()=>{
   const e=$("oEposta").value.trim().toLowerCase(),ad=$("oAd").value.trim();
   const siniflar=[...$("oSiniflar").querySelectorAll("input:checked")].map(c=>c.value);
-  if(!e||!ad||!siniflar.length){oMesaj("E-posta, ad soyad ve en az bir sınıf zorunlu.",false);return}
+  const rehber=$("oRehber").checked;
+  if(!e||!ad||(!siniflar.length&&!rehber)){oMesaj("E-posta, ad soyad ve (rehber yetkisi yoksa) en az bir sınıf zorunlu.",false);return}
   try{
-    await db.collection("ogretmenler").doc(e).set({eposta:e,ad,siniflar});
+    await db.collection("ogretmenler").doc(e).set({eposta:e,ad,siniflar,rehber});
     if(!oDuzen){
       const ik=firebase.apps.find(x=>x.name==="ikinci")||firebase.initializeApp(CFG,"ikinci");
       try{
@@ -325,9 +331,9 @@ async function oListele(){
       const s=document.createElement("div");s.className="satir";
       s.innerHTML="<div><b></b><br><small></small></div><button class='d'>Düzenle</button><button class='g' style='padding:6px 12px;font-size:.85rem'>Şifre e-postası</button><button class='k'>Sil</button>";
       s.querySelector("b").textContent=d.ad;
-      s.querySelector("small").textContent=d.eposta+" · "+(d.siniflar||[]).join(", ");
+      s.querySelector("small").textContent=d.eposta+" · "+(d.rehber?"REHBER YETKİSİ (tüm sınıflar)":(d.siniflar||[]).join(", "));
       const [b1,b2,b3]=s.querySelectorAll("button");
-      b1.onclick=()=>{oDuzen=d.eposta;$("oEposta").value=d.eposta;$("oEposta").disabled=true;$("oAd").value=d.ad||"";oSinifCiz(d.siniflar||[]);
+      b1.onclick=()=>{oDuzen=d.eposta;$("oEposta").value=d.eposta;$("oEposta").disabled=true;$("oAd").value=d.ad||"";$("oRehber").checked=!!d.rehber;oSinifCiz(d.siniflar||[]);
         $("oKaydet").textContent="Değişiklikleri kaydet";$("oIptal").hidden=false;oMesaj("",true);ac($("oEposta"));$("oEposta").scrollIntoView({behavior:"smooth",block:"center"})};
       b2.onclick=async()=>{try{await auth.sendPasswordResetEmail(d.eposta);oMesaj("Şifre belirleme e-postası gönderildi: "+d.eposta,true)}catch(x){oMesaj("E-posta gönderilemedi.",false)}};
       b3.onclick=async()=>{if(!confirm(d.ad+" için BEP erişimi kaldırılsın mı?"))return;await db.collection("ogretmenler").doc(d.eposta).delete();if(oDuzen===d.eposta)oSifirla();oListele()};

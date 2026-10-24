@@ -196,7 +196,7 @@ details .ic ol,details .ic ul{padding-left:22px;margin:6px 0}
     <ul>
       <li>Her öğretmen <b>yalnızca kendisine atanan sınıfların</b> öğrenci dosyalarını görür ve düzenler. Başka sınıfın dosyalarına erişemez.</li>
       <li>Aynı sınıfa birden fazla öğretmen atanmışsa (örneğin özel eğitim sınıfları) o sınıfın dosyalarını birlikte görürler.</li>
-      <li>Rehberlik servisi tüm sınıfların dosyalarına erişebilir.</li>
+      <li>Rehberlik servisi (yönetici ve rehber yetkisi tanımlanan rehber öğretmenler) tüm sınıfların dosyalarına erişebilir.</li>
       <li>Giriş yapmamış hiç kimse öğrenci dosyalarını göremez.</li>
     </ul>
   </div></details>
@@ -270,13 +270,13 @@ details .ic ol,details .ic ul{padding-left:22px;margin:6px 0}
     const e=(u.email||"").toLowerCase();
     try{
       let veri=null;
-      if(e===YONETICI)veri={ad:"Yönetici",siniflar:[]};
+      if(e===YONETICI){veri={ad:"Yönetici",siniflar:[]};try{const d=await db.collection("ogretmenler").doc(e).get();if(d.exists)veri=d.data()}catch(x){}}
       else{const d=await db.collection("ogretmenler").doc(e).get();if(d.exists)veri=d.data()}
       if(!veri){msg("Bu hesaba öğretmen erişimi tanımlanmamış. Rehberlik servisiyle iletişime geçin.");await auth.signOut();return}
       girisli=true;
       const s=(veri.siniflar||[]).join(", ");
       $("adBaslik").textContent="Hoş geldiniz, "+(veri.ad||"Öğretmenim");
-      $("hosgeldin").textContent=s?"Sorumlu olduğunuz sınıflar: "+s:"";
+      $("hosgeldin").textContent=veri.rehber?"Rehber yetkisiyle tüm sınıfların BEP dosyalarına erişebilirsiniz.":(s?"Sorumlu olduğunuz sınıflar: "+s:"");
       const k=$("kilitCss");if(k)k.remove();
       $("giris").style.display="none";
       window.__ogrAc();

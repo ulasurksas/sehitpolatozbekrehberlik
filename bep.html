@@ -493,7 +493,7 @@ async function qn(){return{uygulama:"BEP Haz\u0131rlay\u0131c\u0131",surum:1,tar
       if(e===YONETICI)veri={ad:"Yönetici",siniflar:[],yonetici:true};
       else{const d=await db.collection("ogretmenler").doc(e).get();if(d.exists)veri=d.data()}
       if(!veri){msg("Bu hesaba BEP Hazırlayıcı erişimi tanımlanmamış. Rehberlik servisiyle iletişime geçin.");await auth.signOut();return}
-      window.BEP_KULLANICI={eposta:e,ad:veri.ad||"",siniflar:veri.siniflar||[],yonetici:!!veri.yonetici};
+      window.BEP_KULLANICI={eposta:e,ad:veri.ad||"",siniflar:veri.siniflar||[],rehber:!!veri.rehber,yonetici:!!veri.yonetici||!!veri.rehber};
       bepKur();girisli=true;
       const k=$("kilitCss");if(k)k.remove();
       $("giris").style.display="none";
