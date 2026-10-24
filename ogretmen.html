@@ -127,7 +127,8 @@ details .ic ol,details .ic ul{padding-left:22px;margin:6px 0}
 <main id="detay" class="wrap" hidden></main>
 
 <div id="ana">
-  <div class="hero"><img src="logo.jpg" alt="Logo"><h1>Öğretmen Paneli</h1>
+  <div class="hero"><img src="logo.jpg" alt="Logo"><small style="letter-spacing:.12em;font-weight:700;opacity:.75">ÖĞRETMEN PANELİ</small>
+  <h1 id="adBaslik" style="margin-top:2px">Öğretmen Paneli</h1>
   <p id="hosgeldin"></p><p style="margin-top:14px"><a class="btn" href="bep.html">BEP Hazırlayıcıyı Aç</a></p></div>
 
   <div class="wrap" id="vitrinKutu" hidden><h2 class="b">Son Eklenenler</h2><div class="vitrin" id="vitrin"></div></div>
@@ -269,7 +270,8 @@ details .ic ol,details .ic ul{padding-left:22px;margin:6px 0}
       if(!veri){msg("Bu hesaba öğretmen erişimi tanımlanmamış. Rehberlik servisiyle iletişime geçin.");await auth.signOut();return}
       girisli=true;
       const s=(veri.siniflar||[]).join(", ");
-      $("hosgeldin").textContent="Hoş geldiniz"+(veri.ad?", "+veri.ad:"")+"."+(s?" Sorumlu olduğunuz sınıflar: "+s+".":"");
+      $("adBaslik").textContent="Hoş geldiniz, "+(veri.ad||"Öğretmenim");
+      $("hosgeldin").textContent=s?"Sorumlu olduğunuz sınıflar: "+s:"";
       const k=$("kilitCss");if(k)k.remove();
       $("giris").style.display="none";
       window.__ogrAc();
