@@ -30,6 +30,11 @@ button.g{background:#777;margin:0}
 .satir div{flex:1}
 .satir small{opacity:.7}
 .tamam{color:#1e8449;font-weight:600}.hata{color:#c0392b;font-weight:600}
+#panel .kutu>h2{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;margin:0!important}
+#panel .kutu>h2::after{content:"▾";opacity:.6}
+#panel .kutu.kapali>h2::after{content:"▸"}
+#panel .kutu.kapali>:not(h2){display:none}
+#panel .kutu:not(.kapali)>h2{margin-bottom:10px!important}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -56,6 +61,12 @@ button.g{background:#777;margin:0}
       <button id="oKaydet">Öğretmeni kaydet</button> <button class="g" id="oIptal" hidden>Vazgeç</button>
       <div id="oMesaj"></div>
       <div id="oListe" style="margin-top:12px"></div>
+    </div>
+    <div class="kutu">
+      <h2 style="margin-top:0">BEP dosyaları (sınıflara göre)</h2>
+      <p style="margin-top:0">Dosyayı açıp düzenlemek için yönetici hesabınla <a href="bep.html" target="_blank">BEP Hazırlayıcı</a>'ya gir; tüm sınıfların dosyalarını orada görürsün. Burada sınıflara göre listeyi görebilir ve gerekirse dosya silebilirsin.</p>
+      <button id="bYenile">Listeyi getir</button>
+      <div id="bListe" style="margin-top:12px"></div>
     </div>
     <div class="kutu">
       <h2 style="margin-top:0">Duyuru ekle (ana sayfanın üstünde görünür)</h2>
@@ -175,7 +186,7 @@ function duzenle(id){
   $("video").value=d.video||"";$("fotolar").value=(d.fotolar||[]).join("\n");$("kapak").value=d.kapak||"";$("tarih").value=d.tarih||bugun();$("katYeni").value="";
   cbCiz("katBox",KATS,kO(d));cbCiz("sevBox",SEVS,sO(d));
   $("formBaslik").textContent="İçeriği düzenle";$("ekle").textContent="Değişiklikleri kaydet";$("iptal").hidden=false;
-  mesaj("",true);$("formBaslik").scrollIntoView({behavior:"smooth"});
+  mesaj("",true);ac($("formBaslik"));$("formBaslik").scrollIntoView({behavior:"smooth"});
 }
 
 async function listele(){
@@ -308,13 +319,38 @@ async function oListele(){
       s.querySelector("small").textContent=d.eposta+" · "+(d.siniflar||[]).join(", ");
       const [b1,b2,b3]=s.querySelectorAll("button");
       b1.onclick=()=>{oDuzen=d.eposta;$("oEposta").value=d.eposta;$("oEposta").disabled=true;$("oAd").value=d.ad||"";oSinifCiz(d.siniflar||[]);
-        $("oKaydet").textContent="Değişiklikleri kaydet";$("oIptal").hidden=false;oMesaj("",true);$("oEposta").scrollIntoView({behavior:"smooth",block:"center"})};
+        $("oKaydet").textContent="Değişiklikleri kaydet";$("oIptal").hidden=false;oMesaj("",true);ac($("oEposta"));$("oEposta").scrollIntoView({behavior:"smooth",block:"center"})};
       b2.onclick=async()=>{try{await auth.sendPasswordResetEmail(d.eposta);oMesaj("Şifre belirleme e-postası gönderildi: "+d.eposta,true)}catch(x){oMesaj("E-posta gönderilemedi.",false)}};
       b3.onclick=async()=>{if(!confirm(d.ad+" için BEP erişimi kaldırılsın mı?"))return;await db.collection("ogretmenler").doc(d.eposta).delete();if(oDuzen===d.eposta)oSifirla();oListele()};
       l.appendChild(s);
     });
   }catch(e){l.textContent=""}
 }
+
+async function bListele(){
+  const l=$("bListe");l.textContent="Yükleniyor...";
+  try{
+    const sn=await db.collection("bepOgrenciler").get(),g={};
+    sn.docs.forEach(d=>{const x=d.data(),k=x.sinif||"?";(g[k]=g[k]||[]).push({id:d.id,...x})});
+    const adlar=Object.keys(g).sort((x,y)=>x.localeCompare(y,"tr",{numeric:true}));
+    l.innerHTML="";
+    if(!adlar.length){l.textContent="Henüz BEP dosyası yok.";return}
+    adlar.forEach(s=>{
+      const h=document.createElement("div");h.style.cssText="font-weight:700;margin:12px 0 4px";h.textContent=s+" ("+g[s].length+" dosya)";l.appendChild(h);
+      g[s].sort((x,y)=>(x.ad||"").localeCompare(y.ad||"","tr")).forEach(x=>{
+        const r=document.createElement("div");r.className="satir";
+        r.innerHTML="<div><b></b><br><small></small></div><button class='k'>Sil</button>";
+        r.querySelector("b").textContent=(x.ad||"(adsız)")+" · "+(x.tur||"");
+        r.querySelector("small").textContent="Son düzenleyen: "+(x.duzenleyen||"-")+" · "+(x.guncelleme||"").slice(0,10);
+        r.querySelector("button").onclick=async()=>{if(!confirm("Bu BEP dosyası kalıcı olarak silinsin mi?"))return;await db.collection("bepOgrenciler").doc(x.id).delete();bListele()};
+        l.appendChild(r);
+      });
+    });
+  }catch(e){l.textContent="Liste alınamadı. Güvenlik kuralını kontrol et."}
+}
+$("bYenile").onclick=bListele;
+document.querySelectorAll("#panel .kutu").forEach(k=>{k.classList.add("kapali");k.querySelector("h2").onclick=()=>k.classList.toggle("kapali")});
+const ac=el=>el.closest(".kutu").classList.remove("kapali");
 </script>
 </body>
 </html>
